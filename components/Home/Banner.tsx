@@ -2,6 +2,7 @@
 import React from "react";
 import { WavyBackground } from "@/components/ui/wavy-background";
 import { Button } from "../ui/moving-border";
+import Link from "next/link";
 
 export function Banner() {
   return (
@@ -15,20 +16,27 @@ export function Banner() {
 
       {/* Buttons Section */}
       <div className="flex justify-center gap-6 mt-8">
-        <Button
-          borderRadius="1.75rem"
-          className="px-5 py-2 text-sm md:text-base bg-white dark:bg-black
-            text-black dark:text-white border-whit dark:border-slate-500"
-        >
-          Login
-        </Button>
-        <Button
-          borderRadius="1.75rem"
-          className="px-5 py-2 text-sm md:text-base bg-white dark:bg-black 
+        <Link href="/login" passHref>
+          <Button
+            asChild
+            borderRadius="1.75rem"
+            className="px-5 py-2 text-sm md:text-base bg-white dark:bg-black
+             text-black dark:text-white border-whit dark:border-slate-500"
+          >
+            Login
+          </Button>
+        </Link>
+
+        <Link href={"/signup"} passHref>
+          <Button
+            asChild
+            borderRadius="1.75rem"
+            className="px-5 py-2 text-sm md:text-base bg-white dark:bg-black 
             text-black dark:text-white border-slate-700 dark:border-slate-500"
-        >
-          Sign Up
-        </Button>
+          >
+            Sign Up
+          </Button>
+        </Link>
       </div>
     </WavyBackground>
   );
