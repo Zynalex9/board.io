@@ -1,5 +1,5 @@
-import React from "react";
+import { SignInForm } from "./LoginForm";
 
 export default function page() {
-  return <div>ARE YOU REALLY HEERE???? AT LOGIN???????</div>;
+  return <SignInForm/>
 }
