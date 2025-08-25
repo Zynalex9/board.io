@@ -6,13 +6,17 @@ import { cn } from "@/lib/utils";
 import { IconBrandGithub, IconBrandGoogle } from "@tabler/icons-react";
 import { useForm } from "react-hook-form";
 import { WavyBackground } from "@/components/ui/wavy-background";
+import { supabase } from "@/lib/supabase";
+import { toast } from "sonner";
 
 interface IFormData {
+  fname: string;
+  lname: string;
   username: string;
-  name:string;
+  name: string;
   email: string;
   password: string;
-  avatar: FileList; 
+  avatar: FileList;
 }
 
 export function SignupForm() {
@@ -23,120 +27,157 @@ export function SignupForm() {
     formState: { errors },
   } = useForm<IFormData>();
 
-  const onSubmit = (data: IFormData) => {
+  const onSubmit = async (data: IFormData) => {
     console.log("Form submitted:", data);
+    let avatarUrl = null;
+    const { data: Demo } = await supabase.from("users").select("*");
+    console.log("demo", Demo);
     if (data.avatar && data.avatar.length > 0) {
-      console.log("Uploaded file:", data.avatar[0]);
+      const file = data.avatar[0];
+      const fileExtension = file.name.split(".").pop();
+      const fileName = `${data.username}_${Date.now()}.${fileExtension}`;
+      const filePath = `avatars/${fileName}`;
+      const { error: uploadError } = await supabase.storage
+        .from("boardio")
+        .upload(filePath, file);
+      if (uploadError) {
+        console.error("Error uploading avatar:", uploadError.message);
+      } else {
+        const {
+          data: { publicUrl },
+        } = supabase.storage.from("boardio").getPublicUrl(filePath);
+        avatarUrl = publicUrl;
+      }
     }
+    console.log("Avatar URL:", avatarUrl);
+    const { error: insertError } = await supabase.from("users").insert([
+      {
+        username: data.username,
+        fname: data.fname,
+        lname: data.lname,
+        email: data.email,
+        avatar_url: avatarUrl,
+      },
+    ]);
+    if (insertError) {
+      toast.error(insertError.message);
+    } else {
+      await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+      });
+    }
+    reset();
   };
 
   return (
     <WavyBackground>
-    <div className="shadow-input my-4 mx-auto w-full max-w-md rounded-none bg-white p-4 md:rounded-2xl md:p-8 dark:bg-black">
-      <h2 className="text-xl font-bold text-neutral-800 dark:text-neutral-200">
-        Welcome to Board.io
-      </h2>
+      <div className="shadow-input my-4 mx-auto w-full max-w-md rounded-none bg-white p-4 md:rounded-2xl md:p-8 dark:bg-black">
+        <h2 className="text-xl font-bold text-neutral-800 dark:text-neutral-200">
+          Welcome to board.io
+        </h2>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="mb-4 flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">
-          <LabelInputContainer>
-            <Label htmlFor="firstname">First name</Label>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="mb-4 flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">
+            <LabelInputContainer>
+              <Label htmlFor="firstname">First Name</Label>
+              <Input
+                id="firstname"
+                placeholder="Tyler"
+                type="text"
+                {...register("fname", {
+                  required: "First name is required",
+                })}
+              />
+              {errors.fname && (
+                <p className="text-red-500 text-sm">{errors.fname.message}</p>
+              )}
+            </LabelInputContainer>
+            <LabelInputContainer>
+              <Label htmlFor="name">Last Name</Label>
+              <Input
+                id="name"
+                placeholder="Durden"
+                type="text"
+                {...register("lname", { required: "Last name is required" })}
+              />
+              {errors.lname && (
+                <p className="text-red-500 text-sm">{errors.lname.message}</p>
+              )}
+            </LabelInputContainer>
+          </div>
+
+          <LabelInputContainer className="mb-4">
+            <Label htmlFor="username">Username</Label>
             <Input
-              id="firstname"
-              placeholder="Tyler"
+              id="username"
+              placeholder="projectmayhem"
               type="text"
-              {...register("username", { required: "First name is required" })}
+              {...register("username", { required: "username is required" })}
             />
             {errors.username && (
               <p className="text-red-500 text-sm">{errors.username.message}</p>
             )}
           </LabelInputContainer>
-          <LabelInputContainer>
-            <Label htmlFor="name">Name</Label>
+          <LabelInputContainer className="mb-4">
+            <Label htmlFor="email">Email Address</Label>
             <Input
-              id="name"
-              placeholder="Durden"
-              type="text"
-              {...register("name", { required: "Last name is required" })}
+              id="email"
+              placeholder="projectmayhem@fc.com"
+              type="email"
+              {...register("email", { required: "Email is required" })}
             />
-            {errors.name && (
-              <p className="text-red-500 text-sm">{errors.name.message}</p>
+            {errors.email && (
+              <p className="text-red-500 text-sm">{errors.email.message}</p>
             )}
           </LabelInputContainer>
-        </div>
 
-        <LabelInputContainer className="mb-4">
-          <Label htmlFor="email">Email Address</Label>
-          <Input
-            id="email"
-            placeholder="projectmayhem@fc.com"
-            type="email"
-            {...register("email", { required: "Email is required" })}
-          />
-          {errors.email && (
-            <p className="text-red-500 text-sm">{errors.email.message}</p>
-          )}
-        </LabelInputContainer>
+          <LabelInputContainer className="mb-4">
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              placeholder="••••••••"
+              type="password"
+              {...register("password", { required: "Password is required" })}
+            />
+            {errors.password && (
+              <p className="text-red-500 text-sm">{errors.password.message}</p>
+            )}
+          </LabelInputContainer>
 
-        <LabelInputContainer className="mb-4">
-          <Label htmlFor="password">Password</Label>
-          <Input
-            id="password"
-            placeholder="••••••••"
-            type="password"
-            {...register("password", { required: "Password is required" })}
-          />
-          {errors.password && (
-            <p className="text-red-500 text-sm">{errors.password.message}</p>
-          )}
-        </LabelInputContainer>
+          <LabelInputContainer className="mb-4">
+            <Label htmlFor="avatar">Profile Picture</Label>
+            <Input
+              id="avatar"
+              type="file"
+              accept="image/*"
+              {...register("avatar")}
+            />
+          </LabelInputContainer>
 
-        <LabelInputContainer className="mb-4">
-          <Label htmlFor="avatar">Profile Picture</Label>
-          <Input
-            id="avatar"
-            type="file"
-            accept="image/*"
-            {...register("avatar")}
-          />
-        </LabelInputContainer>
-
-        <button
-          className="group/btn relative block h-10 w-full rounded-md bg-gradient-to-br from-black to-neutral-600 font-medium text-white shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:bg-zinc-800 dark:from-zinc-900 dark:to-zinc-900 dark:shadow-[0px_1px_0px_0px_#27272a_inset,0px_-1px_0px_0px_#27272a_inset]"
-          type="submit"
-        >
-          Sign up &rarr;
-          <BottomGradient />
-        </button>
-
-        <div className="my-8 h-[1px] w-full bg-gradient-to-r from-transparent via-neutral-300 to-transparent dark:via-neutral-700" />
-
-        <div className="flex flex-col space-y-4">
           <button
-            className="group/btn shadow-input relative flex h-10 w-full items-center justify-start space-x-2 rounded-md bg-gray-50 px-4 font-medium text-black dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_#262626]"
-            type="button"
-            onClick={() => console.log("Sign up with GitHub")}
+            className="group/btn relative block h-10 w-full rounded-md bg-gradient-to-br from-black to-neutral-600 font-medium text-white shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:bg-zinc-800 dark:from-zinc-900 dark:to-zinc-900 dark:shadow-[0px_1px_0px_0px_#27272a_inset,0px_-1px_0px_0px_#27272a_inset]"
+            type="submit"
           >
-            <IconBrandGithub className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
-            <span className="text-sm text-neutral-700 dark:text-neutral-300">
-              GitHub
-            </span>
+            Sign up &rarr;
             <BottomGradient />
           </button>
-          <button
-            className="group/btn shadow-input relative flex h-10 w-full items-center justify-start space-x-2 rounded-md bg-gray-50 px-4 font-medium text-black dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_#262626]"
-            type="button"
-            onClick={() => console.log("Sign up with Google")}
-          >
-            <IconBrandGoogle className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
-            <span className="text-sm text-neutral-700 dark:text-neutral-300">
-              Google
-            </span>
-            <BottomGradient />
-          </button>
-        </div>
-      </form>
-    </div>
+
+          <div className="my-8 h-[1px] w-full bg-gradient-to-r from-transparent via-neutral-300 to-transparent dark:via-neutral-700" />
+          <div className="flex flex-col space-y-4">
+            <button
+              className="group/btn shadow-input relative flex h-10 w-full items-center justify-start space-x-2 rounded-md bg-gray-50 px-4 font-medium text-black dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_#262626]"
+              type="button"
+            >
+              <IconBrandGoogle className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
+              <span className="text-sm text-neutral-700 dark:text-neutral-300">
+                Google
+              </span>
+              <BottomGradient />
+            </button>
+          </div>
+        </form>
+      </div>
     </WavyBackground>
   );
 }

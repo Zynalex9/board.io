@@ -1,11 +1,13 @@
 "use client";
 import React from "react";
+import { useRouter } from "next/navigation";
 import { Label } from "@/components/ui/aceLabel";
 import { Input } from "@/components/ui/aceInput";
 import { cn } from "@/lib/utils";
 import { IconBrandGithub, IconBrandGoogle } from "@tabler/icons-react";
 import { useForm } from "react-hook-form";
 import { WavyBackground } from "@/components/ui/wavy-background";
+import { supabase } from "@/lib/supabase";
 
 interface IFormData {
   email: string;
@@ -13,6 +15,7 @@ interface IFormData {
 }
 
 export function SignInForm() {
+  const [errorMessage, setErrorMessage] = React.useState("");
   const {
     register,
     handleSubmit,
@@ -20,8 +23,20 @@ export function SignInForm() {
     formState: { errors },
   } = useForm<IFormData>();
 
-  const onSubmit = (data: IFormData) => {
-    console.log("Form submitted:", data);
+  const router = useRouter();
+  const onSubmit = async (data: IFormData) => {
+    const { error } = await supabase.auth.signInWithPassword({
+      email: data.email,
+      password: data.password,
+    });
+
+    if (error) {
+      console.error("Login error:", error.message);
+      setErrorMessage(error.message);
+      return;
+    }
+
+    router.push("/");
   };
 
   return (
@@ -57,7 +72,9 @@ export function SignInForm() {
               <p className="text-red-500 text-sm">{errors.password.message}</p>
             )}
           </LabelInputContainer>
-
+          {errorMessage && (
+            <p className="text-red-500 text-sm">{errorMessage}</p>
+          )}
           <button
             className="group/btn relative block h-10 w-full rounded-md bg-gradient-to-br from-black to-neutral-600 font-medium text-white shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:bg-zinc-800 dark:from-zinc-900 dark:to-zinc-900 dark:shadow-[0px_1px_0px_0px_#27272a_inset,0px_-1px_0px_0px_#27272a_inset]"
             type="submit"
