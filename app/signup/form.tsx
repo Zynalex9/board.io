@@ -8,12 +8,10 @@ import { useForm } from "react-hook-form";
 import { WavyBackground } from "@/components/ui/wavy-background";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
+import Link from "next/link";
 
 interface IFormData {
-  fname: string;
-  lname: string;
   username: string;
-  name: string;
   email: string;
   password: string;
   avatar: FileList;
@@ -24,14 +22,11 @@ export function SignupForm() {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<IFormData>();
 
   const onSubmit = async (data: IFormData) => {
-    console.log("Form submitted:", data);
     let avatarUrl = null;
-    const { data: Demo } = await supabase.from("users").select("*");
-    console.log("demo", Demo);
     if (data.avatar && data.avatar.length > 0) {
       const file = data.avatar[0];
       const fileExtension = file.name.split(".").pop();
@@ -49,14 +44,11 @@ export function SignupForm() {
         avatarUrl = publicUrl;
       }
     }
-    console.log("Avatar URL:", avatarUrl);
     const { error: signUpError } = await supabase.auth.signUp({
       email: data.email,
       password: data.password,
       options: {
         data: {
-          fname: data.fname,
-          lname: data.lname,
           username: data.username,
           avatar_url: avatarUrl,
         },
@@ -83,40 +75,13 @@ export function SignupForm() {
 
   return (
     <WavyBackground>
-      <div className="shadow-input my-4 mx-auto w-full max-w-md rounded-none bg-white p-4 md:rounded-2xl md:p-8 dark:bg-black">
+      <div className="shadow-input my-14 mx-auto w-full max-w-md rounded-none bg-white p-4 md:rounded-2xl md:p-8 dark:bg-black">
         <h2 className="text-xl font-bold text-neutral-800 dark:text-neutral-200">
           Welcome to board.io
         </h2>
 
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="mb-4 flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">
-            <LabelInputContainer>
-              <Label htmlFor="firstname">First Name</Label>
-              <Input
-                id="firstname"
-                placeholder="Tyler"
-                type="text"
-                {...register("fname", {
-                  required: "First name is required",
-                })}
-              />
-              {errors.fname && (
-                <p className="text-red-500 text-sm">{errors.fname.message}</p>
-              )}
-            </LabelInputContainer>
-            <LabelInputContainer>
-              <Label htmlFor="name">Last Name</Label>
-              <Input
-                id="name"
-                placeholder="Durden"
-                type="text"
-                {...register("lname", { required: "Last name is required" })}
-              />
-              {errors.lname && (
-                <p className="text-red-500 text-sm">{errors.lname.message}</p>
-              )}
-            </LabelInputContainer>
-          </div>
+         
 
           <LabelInputContainer className="mb-4">
             <Label htmlFor="username">Username</Label>
@@ -165,20 +130,33 @@ export function SignupForm() {
               {...register("avatar")}
             />
           </LabelInputContainer>
+          <p>
+            Already have an account?{" "}
+            <Link href="/login" className="text-blue-600 inline-block hover:underline">
+              Login now
+            </Link>
+          </p>
 
           <button
-            className="group/btn relative block h-10 w-full rounded-md bg-gradient-to-br from-black to-neutral-600 font-medium text-white shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:bg-zinc-800 dark:from-zinc-900 dark:to-zinc-900 dark:shadow-[0px_1px_0px_0px_#27272a_inset,0px_-1px_0px_0px_#27272a_inset]"
+            className={`group/btn relative cursor-pointer block h-10 w-full rounded-md bg-gradient-to-br from-black to-neutral-600 font-medium text-white shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:bg-zinc-800 dark:from-zinc-900 dark:to-zinc-900 dark:shadow-[0px_1px_0px_0px_#27272a_inset,0px_-1px_0px_0px_#27272a_inset] ${
+              isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+            }`}
             type="submit"
+            disabled={isSubmitting}
           >
-            Sign up &rarr;
+            {isSubmitting ? "Signing up..." : <>Sign up &rarr;</>}
+
             <BottomGradient />
           </button>
 
           <div className="my-8 h-[1px] w-full bg-gradient-to-r from-transparent via-neutral-300 to-transparent dark:via-neutral-700" />
           <div className="flex flex-col space-y-4">
             <button
+              disabled={isSubmitting}
               onClick={handleSignInWithGoogle}
-              className="group/btn shadow-input relative flex h-10 w-full items-center justify-start space-x-2 rounded-md bg-gray-50 px-4 font-medium text-black dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_#262626]"
+              className={`group/btn shadow-input relative flex h-10 w-full items-center justify-start space-x-2 rounded-md bg-gray-50 cursor-pointer px-4 font-medium text-black dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_#262626] ${
+                isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+              }`}
               type="button"
             >
               <IconBrandGoogle className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />

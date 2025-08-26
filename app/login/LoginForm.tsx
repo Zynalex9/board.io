@@ -8,6 +8,8 @@ import { IconBrandGithub, IconBrandGoogle } from "@tabler/icons-react";
 import { useForm } from "react-hook-form";
 import { WavyBackground } from "@/components/ui/wavy-background";
 import { supabase } from "@/lib/supabase";
+import { toast } from "sonner";
+import Link from "next/link";
 
 interface IFormData {
   email: string;
@@ -16,15 +18,16 @@ interface IFormData {
 
 export function SignInForm() {
   const [errorMessage, setErrorMessage] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
   } = useForm<IFormData>();
-
   const router = useRouter();
   const onSubmit = async (data: IFormData) => {
+    setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({
       email: data.email,
       password: data.password,
@@ -33,12 +36,24 @@ export function SignInForm() {
     if (error) {
       console.error("Login error:", error.message);
       setErrorMessage(error.message);
+      setLoading(false);
       return;
     }
-
+    setLoading(false);
+    reset();
     router.push("/");
   };
-
+  const handleSignInWithGoogle = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/`,
+      },
+    });
+    if (error) {
+      toast.error(error.message);
+    }
+  };
   return (
     <WavyBackground>
       <div className="shadow-input my-4 mx-auto w-full max-w-md rounded-none bg-white p-4 md:rounded-2xl md:p-8 dark:bg-black">
@@ -75,11 +90,22 @@ export function SignInForm() {
           {errorMessage && (
             <p className="text-red-500 text-sm">{errorMessage}</p>
           )}
+          <p>
+            Don't have an account?{" "}
+            <Link
+              href="/signup"
+              className="text-blue-600 inline-block hover:underline"
+            >
+              Register now
+            </Link>
+          </p>
           <button
-            className="group/btn relative block h-10 w-full rounded-md bg-gradient-to-br from-black to-neutral-600 font-medium text-white shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:bg-zinc-800 dark:from-zinc-900 dark:to-zinc-900 dark:shadow-[0px_1px_0px_0px_#27272a_inset,0px_-1px_0px_0px_#27272a_inset]"
+            className="group/btn relative cursor-pointer block h-10 w-full rounded-md bg-gradient-to-br from-black to-neutral-600 font-medium text-white shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:bg-zinc-800 dark:from-zinc-900 dark:to-zinc-900 dark:shadow-[0px_1px_0px_0px_#27272a_inset,0px_-1px_0px_0px_#27272a_inset]"
             type="submit"
+            disabled={loading}
           >
-            Sign In &rarr;
+            {loading ? "Signing In" : <>Sign In &rarr;</>}
+
             <BottomGradient />
           </button>
 
@@ -87,20 +113,10 @@ export function SignInForm() {
 
           <div className="flex flex-col space-y-4">
             <button
-              className="group/btn shadow-input relative flex h-10 w-full items-center justify-start space-x-2 rounded-md bg-gray-50 px-4 font-medium text-black dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_#262626]"
+              className="group/btn shadow-input cursor-pointer relative flex h-10 w-full items-center justify-start space-x-2 rounded-md bg-gray-50 px-4 font-medium text-black dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_#262626]"
               type="button"
-              onClick={() => console.log("Sign up with GitHub")}
-            >
-              <IconBrandGithub className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
-              <span className="text-sm text-neutral-700 dark:text-neutral-300">
-                GitHub
-              </span>
-              <BottomGradient />
-            </button>
-            <button
-              className="group/btn shadow-input relative flex h-10 w-full items-center justify-start space-x-2 rounded-md bg-gray-50 px-4 font-medium text-black dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_#262626]"
-              type="button"
-              onClick={() => console.log("Sign up with Google")}
+              disabled={loading}
+              onClick={handleSignInWithGoogle}
             >
               <IconBrandGoogle className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
               <span className="text-sm text-neutral-700 dark:text-neutral-300">
