@@ -50,24 +50,35 @@ export function SignupForm() {
       }
     }
     console.log("Avatar URL:", avatarUrl);
-    const { error: insertError } = await supabase.from("users").insert([
-      {
-        username: data.username,
-        fname: data.fname,
-        lname: data.lname,
-        email: data.email,
-        avatar_url: avatarUrl,
+    const { error: signUpError } = await supabase.auth.signUp({
+      email: data.email,
+      password: data.password,
+      options: {
+        data: {
+          fname: data.fname,
+          lname: data.lname,
+          username: data.username,
+          avatar_url: avatarUrl,
+        },
       },
-    ]);
-    if (insertError) {
-      toast.error(insertError.message);
-    } else {
-      await supabase.auth.signUp({
-        email: data.email,
-        password: data.password,
-      });
+    });
+    if (signUpError) {
+      toast.error(signUpError.message);
+      return;
     }
     reset();
+  };
+
+  const handleSignInWithGoogle = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/`,
+      },
+    });
+    if (error) {
+      toast.error(error.message);
+    }
   };
 
   return (
@@ -166,6 +177,7 @@ export function SignupForm() {
           <div className="my-8 h-[1px] w-full bg-gradient-to-r from-transparent via-neutral-300 to-transparent dark:via-neutral-700" />
           <div className="flex flex-col space-y-4">
             <button
+              onClick={handleSignInWithGoogle}
               className="group/btn shadow-input relative flex h-10 w-full items-center justify-start space-x-2 rounded-md bg-gray-50 px-4 font-medium text-black dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_#262626]"
               type="button"
             >
