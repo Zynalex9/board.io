@@ -13,7 +13,7 @@ export const SingleFolder = () => {
             isActiveLink(`/dashboard/folder/untitled${idx + 1}`, pathname)
               ? "px-4 py-1.5 bg-[#2A2B2B] text-white border-gray-500 border-[0.5px] rounded-lg"
               : "px-4 py-1.5 text-gray-300 font-normal hover:text-white"
-          }`}
+          } hover:bg-[#2A2B2B] text-white rounded transition-all duration-100 `}
           key={idx}
         >
           <Link
