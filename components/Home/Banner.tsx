@@ -7,12 +7,13 @@ import { supabase } from "@/lib/supabase";
 import { useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
 import { useDispatch } from "react-redux";
-import { getUser } from "@/store/userSlice";
+import { getUser, handleUserLogout } from "@/store/userSlice";
 
 export function Banner() {
   const dispatch = useDispatch<AppDispatch>();
   const handleLogout = async () => {
     await supabase.auth.signOut();
+    dispatch(handleUserLogout());
   };
   const { user } = useSelector((state: RootState) => state.auth);
   const getUserData = async () => {

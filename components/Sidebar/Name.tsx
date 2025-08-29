@@ -26,11 +26,14 @@ export function Name() {
       console.log(error);
     }
   };
-  React.useEffect(() => {
-    getUserData();
-  }, [dispatch]);
-  const { user } = useSelector((state: RootState) => state.auth);
 
+  const { user } = useSelector((state: RootState) => state.auth);
+  React.useEffect(() => {
+    if (!user) {
+      getUserData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch]);
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>

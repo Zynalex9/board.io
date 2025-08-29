@@ -41,7 +41,7 @@ export function SignInForm() {
     }
     setLoading(false);
     reset();
-    router.push("/");
+    router.push("/dashboard");
   };
   const handleSignInWithGoogle = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
