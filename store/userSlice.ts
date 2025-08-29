@@ -1,0 +1,67 @@
+import { supabase } from "@/lib/supabase";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+
+export interface IUser {
+  id: string;
+  username: string;
+  email: string;
+  avatar_url: string;
+  fname?: string;
+  lname?: string;
+}
+interface InitialState {
+  user: IUser | null;
+  isLoading: boolean;
+  error: string | null;
+}
+
+const initialState: InitialState = {
+  user: null,
+  isLoading: false,
+  error: null,
+};
+export const getUser = createAsyncThunk<IUser | null>(
+  "user/getUser",
+  async () => {
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+    if (authError) throw authError;
+
+    if (user) {
+      const { data: profile, error } = await supabase
+        .from("users")
+        .select("*")
+        .eq("id", user.id)
+        .single();
+
+      if (error) throw error;
+      return profile as IUser;
+    }
+
+    return null;
+  }
+);
+
+const userSlice = createSlice({
+  name: "UserSlice",
+  initialState,
+  reducers: {},
+  extraReducers: (builder) => {
+    builder.addCase(getUser.pending, (state) => {
+      state.isLoading = true;
+      state.error = null;
+    });
+    builder.addCase(getUser.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.user = action.payload;
+    });
+    builder.addCase(getUser.rejected, (state, action) => {
+      state.isLoading = false;
+      state.error = action.error.message || "Failed to fetch user";
+    });
+  },
+});
+
+export default userSlice.reducer;
