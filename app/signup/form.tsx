@@ -56,6 +56,7 @@ export function SignupForm() {
     });
     if (signUpError) {
       toast.error(signUpError.message);
+      console.log("Signup error:", signUpError);
       return;
     }
     reset();

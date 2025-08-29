@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { AppDispatch, RootState } from "@/store/store";
 import { getUser } from "@/store/userSlice";
+import { ArrowDown } from "lucide-react";
 export function Name() {
   const [position, setPosition] = React.useState("bottom");
   const dispatch = useDispatch<AppDispatch>();
@@ -29,12 +30,21 @@ export function Name() {
     getUserData();
   }, [dispatch]);
   const { user } = useSelector((state: RootState) => state.auth);
-  console.log(user);
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline">{user?.username}'s Team</Button>
+        {user && (
+          <Button
+            variant="ghost"
+            className="text-2xl flex items-center gap-2 focus:outline-none active:scale-95 active:outline-0"
+          >
+            <h1 className="font-Inter font-semibold">
+              {user?.username}'s Team
+            </h1>
+            <ArrowDown size={28} />
+          </Button>
+        )}
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
         <DropdownMenuLabel>Panel Position</DropdownMenuLabel>

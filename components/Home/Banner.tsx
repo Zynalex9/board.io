@@ -1,24 +1,30 @@
 "use client";
-import React, { useEffect } from "react";
+import React from "react";
 import { WavyBackground } from "@/components/ui/wavy-background";
 import { Button } from "../ui/moving-border";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store/store";
+import { useDispatch } from "react-redux";
+import { getUser } from "@/store/userSlice";
 
 export function Banner() {
-  const [session, setSession] = React.useState<any>(null);
-  const getUser = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    setSession(user);
-  };
-  useEffect(() => {
-    getUser();
-  }, []);
+  const dispatch = useDispatch<AppDispatch>();
   const handleLogout = async () => {
     await supabase.auth.signOut();
   };
+  const { user } = useSelector((state: RootState) => state.auth);
+  const getUserData = async () => {
+    try {
+      await dispatch(getUser());
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  React.useEffect(() => {
+    getUserData();
+  }, [dispatch]);
   return (
     <WavyBackground className="max-w-4xl mx-auto pb-16">
       <p className="text-2xl md:text-4xl lg:text-7xl text-white font-bold inter-var text-center">
@@ -27,7 +33,7 @@ export function Banner() {
       <p className="text-base md:text-lg mt-4 text-white font-normal inter-var text-center">
         Leverage the power of canvas to create beautiful diagrams and stories
       </p>
-      {session ? (
+      {user ? (
         <div className="flex justify-center gap-6 mt-8">
           <Link href="/dashboard">
             <Button
