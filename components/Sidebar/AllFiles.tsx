@@ -1,0 +1,40 @@
+"use client";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import React from "react";
+
+export const AllFiles = () => {
+  const pathname = usePathname();
+  const isActive = (href: string) => pathname === href;
+
+  return (
+    <Link
+      href={"/dashboard/all"}
+      className={`no-underline `}
+    >
+      <div className={`flex items-center justify-between mt-10 mb-5 w-full px-4 py-1.5 ${
+        isActive("/dashboard/all")
+          ? "text-white font-bold bg-[#2A2B2B] border-gray-500 border-[0.5px] rounded-lg"
+          : "text-gray-300 font-normal hover:text-white"
+      }`}>
+        <div className="flex items-center gap-2 ">
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 12 12"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className=""
+          >
+            <path
+              d="M1.7.5A1.2 1.2 0 00.5 1.7v2.6a1.2 1.2 0 001.2 1.2h2.6a1.2 1.2 0 001.2-1.2V1.7A1.2 1.2 0 004.3.5H1.7zM7.7.5a1.2 1.2 0 00-1.2 1.2v2.6a1.2 1.2 0 001.2 1.2h2.6a1.2 1.2 0 001.2-1.2V1.7A1.2 1.2 0 0010.3.5H7.7zM1.7 6.5A1.2 1.2 0 00.5 7.7v2.6a1.2 1.2 0 001.2 1.2h2.6a1.2 1.2 0 001.2-1.2V7.7a1.2 1.2 0 00-1.2-1.2H1.7zM7.7 6.5a1.2 1.2 0 00-1.2 1.2v2.6a1.2 1.2 0 001.2 1.2h2.6a1.2 1.2 0 001.2-1.2V7.7a1.2 1.2 0 00-1.2-1.2H7.7z"
+              fill="currentColor"
+            ></path>
+          </svg>
+          <h1>All Files</h1>
+        </div>
+        A
+      </div>
+    </Link>
+  );
+};

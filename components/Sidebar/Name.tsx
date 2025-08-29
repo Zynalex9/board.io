@@ -40,9 +40,9 @@ export function Name() {
         {user && (
           <Button
             variant="ghost"
-            className="text-2xl flex items-center gap-2 focus:outline-none active:scale-95 active:outline-0"
+            className="text-xl flex items-center gap-2 focus:outline-none active:scale-95 active:outline-0"
           >
-            <h1 className="font-Inter font-semibold">
+            <h1 className="font-Inter">
               {user?.username}'s Team
             </h1>
             <ArrowDown size={28} />
