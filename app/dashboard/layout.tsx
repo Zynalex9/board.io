@@ -9,7 +9,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <Provider store={store}>
       <div className="flex">
         <Sidebar />
-        <main className="flex-1 p-4">{children}</main>
+        <main className="flex-1 p-4  ml-[22%]">{children}</main>
       </div>
     </Provider>
   );
