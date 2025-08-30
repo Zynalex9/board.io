@@ -19,10 +19,11 @@
 
 }
 .silver-border {
-  border: 0.25px solid silver; 
+  border: 1px solid rgba(192, 192, 192, 0.4); /* faded opacity */
   border-radius: 6px;
   padding: 10px;
 }
+
 
 
 .silver-border:hover {
