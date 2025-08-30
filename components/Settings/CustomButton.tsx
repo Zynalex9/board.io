@@ -11,13 +11,13 @@ export const CustomButton = ({
 }: {
   btnText: string;
   Icon: CustomIcon;
-  handleClick: () => void;
-  isActive: boolean;
+  handleClick?: () => void;
+  isActive?: boolean;
 }) => {
   return (
     <button
       onClick={handleClick}
-      className={`flex items-center gap-2 px-2 py-1.5 hover:bg- text-sm text-gray-50 font-Inter cursor-pointer w-full ${
+      className={`flex items-center gap-2 px-2 py-1.5 hover:bg- text-sm text-gray-50 font-Inter cursor-pointer w-full rounded-sm ${
         isActive
           ? "bg-blue-500"
           : "hover:bg-[#2A2B2B] text-white rounded transition-all duration-100"

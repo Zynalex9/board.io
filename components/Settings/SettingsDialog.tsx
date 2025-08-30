@@ -5,9 +5,7 @@ import {
   AlertDialogContent,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { FaUsers } from "react-icons/fa";
 import { Settings } from "lucide-react";
-import { CustomButton } from "./CustomButton";
 import { ButtonsComp } from "./ButtonsComp";
 export const SettingsDialog = () => {
   return (
@@ -31,7 +29,7 @@ export const SettingsDialog = () => {
             </AlertDialogCancel>
           </div>
         </div>
-
+        <div className="h-px w-full bg-gray-400/40"></div>
         <div className="flex flex-grow px-6">
           <div className="w-1/5 h-full">
             <ButtonsComp />
