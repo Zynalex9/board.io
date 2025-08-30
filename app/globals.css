@@ -8,6 +8,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-border-one:rgba(192, 192, 192, 0.4);
   --color-primary-bg:#2A2B2B;
   --color-dim-gray:#878787;
   --font-sans: var(--font-geist-sans);
@@ -20,15 +21,10 @@
 
 }
 .silver-border {
-  border: 1px solid rgba(192, 192, 192, 0.4); /* faded opacity */
+  border: 0.25px solid rgba(192, 192, 192, 0.4); /* faded opacity */
   border-radius: 6px;
 }
 
-
-
-.silver-border:hover {
-  border-color: white;        /* change to gray on hover */
-}
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;

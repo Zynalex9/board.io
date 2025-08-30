@@ -1,16 +1,14 @@
 import React from "react";
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { FaUsers } from "react-icons/fa";
 import { Settings } from "lucide-react";
+import { CustomButton } from "./CustomButton";
+import { ButtonsComp } from "./ButtonsComp";
 export const SettingsDialog = () => {
   return (
     <AlertDialog>
@@ -20,18 +18,26 @@ export const SettingsDialog = () => {
           Settings
         </button>
       </AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-          <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete your
-            account and remove your data from our servers.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Continue</AlertDialogAction>
-        </AlertDialogFooter>
+      <AlertDialogContent className="!w-[73rem] silver-border !max-w-[73rem] h-[35rem] px-2 py-4 m-0 border-0 shadow-2xl bg-[#171717] flex flex-col">
+        <div className="w-full px-6 flex items-center justify-between h-[4rem]">
+          <h1 className="text-3xl font-Inter text-white w-[20%]">Settings</h1>
+          <div className="flex items-center gap-2 w-[80%]">
+            <input
+              className="silver-border px-2 py-1.5 focus:outline-none active:outline-none w-[90%]"
+              placeholder="Search"
+            />
+            <AlertDialogCancel className="bg-primary-bg border-0">
+              Cancel
+            </AlertDialogCancel>
+          </div>
+        </div>
+
+        <div className="flex flex-grow px-6">
+          <div className="w-1/5 h-full">
+            <ButtonsComp />
+          </div>
+          <div className="w-4/5 h-full"></div>
+        </div>
       </AlertDialogContent>
     </AlertDialog>
   );
