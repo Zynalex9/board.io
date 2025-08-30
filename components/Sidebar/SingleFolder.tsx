@@ -18,7 +18,7 @@ export const SingleFolder = () => {
           key={idx}
         >
           <Link
-            href={`/dashboard/folder/untitled${idx + 1}`}
+            href={`/dashboard/folders/untitled${idx + 1}`}
             className={`block`}
           >
             Untitled Folder {idx + 1}
