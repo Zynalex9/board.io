@@ -1,16 +1,18 @@
-'use client'
 import React from "react";
 import { Sidebar } from "./Sidebar";
-import { Provider } from "react-redux";
-import store from "@/store/store";
+import { AllBoxes } from "@/components/DashboardLayout/AllBoxes";
+import { ReduxProvider } from "../providers";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <Provider store={store}>
+    <ReduxProvider>
       <div className="flex bg-[#171717] min-h-screen">
         <Sidebar />
-        <main className="flex-1 p-4  ml-[22%] bg-[#171717]">{children}</main>
+        <main className="flex-1 p-4  ml-[22%] bg-[#171717]">
+          <AllBoxes />
+          {children}
+        </main>
       </div>
-    </Provider>
+    </ReduxProvider>
   );
 }

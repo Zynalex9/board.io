@@ -1,3 +1,4 @@
+'use client'
 import { isActiveLink } from "@/lib/helper";
 import { FolderPlus } from "lucide-react";
 import Link from "next/link";
