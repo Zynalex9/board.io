@@ -15,6 +15,17 @@ import {
 import { AppDispatch, RootState } from "@/store/store";
 import { getUser } from "@/store/userSlice";
 import { ArrowDown, LogOut, Settings, Users } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 export function Name() {
   const [position, setPosition] = React.useState("bottom");
   const dispatch = useDispatch<AppDispatch>();
@@ -61,22 +72,60 @@ export function Name() {
           {user?.username}'s Teams
         </DropdownMenuItem>
         <DropdownMenuSeparator className="bg-gray-500" />
-        <DropdownMenuItem>
-          <div className="flex flex-col space-y-3">
-            <button className="flex items-center gap-2 text-xs text-gray-50 font-Inter cursor-pointer">
-              <Users size={16} />
-              Join or Create Team
-            </button>
-            <button className="flex items-center gap-2 text-xs text-gray-50 font-Inter cursor-pointer">
-              <Settings size={16} />
-              Settings
-            </button>
-            <button className="flex items-center gap-2 text-xs text-gray-50 font-Inter cursor-pointer">
+        <div className="space-y-2 px-2 py-2">
+          <DropdownMenuItem asChild>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <button className="flex items-center gap-2 text-xs text-gray-50 font-Inter cursor-pointer w-full">
+                  <Users size={16} />
+                  Join or Create Team
+                </button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete
+                    your account and remove your data from our servers.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction>Continue</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <button className="flex items-center gap-2 text-xs text-gray-50 font-Inter cursor-pointer w-full">
+                  <Settings size={16} />
+                  Settings
+                </button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete
+                    your account and remove your data from our servers.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction>Continue</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <button className="flex items-center -mx-2 gap-2 text-xs text-gray-50 font-Inter cursor-pointer w-full">
               <LogOut size={16} />
               Logout
             </button>
-          </div>
-        </DropdownMenuItem>
+          </DropdownMenuItem>
+        </div>
         <DropdownMenuSeparator className="bg-gray-500" />
         <DropdownMenuItem>
           <div className="flex items-center gap-3  rounded-xl shadow-md">
