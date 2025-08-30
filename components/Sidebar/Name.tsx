@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
@@ -13,7 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { AppDispatch, RootState } from "@/store/store";
 import { getUser } from "@/store/userSlice";
-import { ArrowDown } from "lucide-react";
+import { ArrowDown, LogOut, Settings, Users } from "lucide-react";
 export function Name() {
   const [position, setPosition] = React.useState("bottom");
   const dispatch = useDispatch<AppDispatch>();
@@ -55,14 +56,45 @@ export function Name() {
           </Button>
         )}
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56 bg-[#171717]">
-        <DropdownMenuLabel>Panel Position</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuRadioGroup value={position} onValueChange={setPosition}>
-          <DropdownMenuRadioItem value="top">Top</DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value="bottom">Bottom</DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value="right">Right</DropdownMenuRadioItem>
-        </DropdownMenuRadioGroup>
+      <DropdownMenuContent className="w-56 bg-[#171717] border-[0.5px] border-gray-400">
+        <DropdownMenuItem className="text-white bg-blue-600 text-sm rounded-md cursor-pointer font-Inter px-1.5 py-1">
+          {user?.username}'s Teams
+        </DropdownMenuItem>
+        <DropdownMenuSeparator className="bg-gray-500" />
+        <DropdownMenuItem>
+          <div className="flex flex-col space-y-3">
+            <button className="flex items-center gap-2 text-xs text-gray-50 font-Inter cursor-pointer">
+              <Users size={16} />
+              Join or Create Team
+            </button>
+            <button className="flex items-center gap-2 text-xs text-gray-50 font-Inter cursor-pointer">
+              <Settings size={16} />
+              Settings
+            </button>
+            <button className="flex items-center gap-2 text-xs text-gray-50 font-Inter cursor-pointer">
+              <LogOut size={16} />
+              Logout
+            </button>
+          </div>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator className="bg-gray-500" />
+        <DropdownMenuItem>
+          <div className="flex items-center gap-3  rounded-xl shadow-md">
+            <img
+              src={user?.avatar_url || "/Profile_avatar_placeholder_large.png"}
+              alt="profile picture"
+              className="w-10 h-10 rounded-full object-cover border border-gray-700"
+            />
+            <div className="flex flex-col">
+              <h2 className="text-sm font-bold text-white font-Inter">
+                {user?.username || "Guest User"}
+              </h2>
+              <h2 className="text-xs text-gray-400 font-Inter">
+                {user?.email || "guest@example.com"}
+              </h2>
+            </div>
+          </div>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
