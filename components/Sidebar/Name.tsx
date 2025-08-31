@@ -18,6 +18,9 @@ import { ArrowDown, LogOut, Settings, Users } from "lucide-react";
 import { JoinTeamDialog } from "../Join/JoinTeamDialog";
 import { SettingsDialog } from "../Settings/SettingsDialog";
 import { Profile } from "./Profile";
+import { supabase } from "@/lib/supabase";
+import { toast } from "sonner";
+import { IMemberTeam } from "@/types/allTypes";
 export function Name() {
   const dispatch = useDispatch<AppDispatch>();
   const getUserData = async () => {
@@ -33,8 +36,36 @@ export function Name() {
     if (!user) {
       getUserData();
     }
+    if (user) {
+      getTeams();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch]);
+  }, [user]);
+  const [teams, setTeams] = React.useState<IMemberTeam[]>([]);
+  const getTeams = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("team_members")
+        .select(
+          `
+              role,
+              joined_at,
+              teams:team_id (
+                id, name, created_by, created_at
+              )
+            `
+        )
+        .eq("user_id", user?.id);
+
+      if (error) throw error;
+      setTeams(data ?? []);
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
+  React.useEffect(() => {
+    console.log(teams);
+  }, [teams]);
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -59,9 +90,12 @@ export function Name() {
         )}
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56 bg-[#171717] border-[0.5px] border-gray-400">
-        <DropdownMenuItem className="text-white bg-blue-600 text-sm rounded-md cursor-pointer font-Inter px-1.5 py-1">
-          {user?.username}'s Teams
-        </DropdownMenuItem>
+        {teams.length > 0 &&
+          teams.map((team) => (
+            <DropdownMenuItem className="text-white my-1 bg-blue-600 text-sm rounded-md cursor-pointer font-Inter px-1.5 py-1">
+              {team.teams.name}
+            </DropdownMenuItem>
+          ))}
         <DropdownMenuSeparator className="bg-gray-500" />
         <div className="space-y-2 px-2 py-2">
           <DropdownMenuItem asChild>
@@ -79,7 +113,7 @@ export function Name() {
         </div>
         <DropdownMenuSeparator className="bg-gray-500" />
         <DropdownMenuItem>
-          <Profile user={user}/>
+          <Profile user={user} />
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -12,7 +12,7 @@ export const Appearance = () => {
       <img
         src="https://app.eraser.io/static/images/settingsModal/darkBg.svg"
         alt=""
-        className="h-[20rem] w-[60rem] object-fill object-center"
+        className="h-[16rem]  object-fill object-center"
       />
     </div>
   );

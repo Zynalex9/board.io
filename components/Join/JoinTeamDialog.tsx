@@ -1,17 +1,51 @@
+"use client";
 import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
   AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Users } from "lucide-react";
+import { DynamicInput } from "../Reuseable/DynamicInput";
+import { RootState } from "@/store/store";
+import { useState } from "react";
+import { useSelector } from "react-redux";
+import { supabase } from "@/lib/supabase";
+import { toast } from "sonner";
 
 export const JoinTeamDialog = () => {
+  const { user } = useSelector((state: RootState) => state.auth);
+  const [teamName, setTeamName] = useState(`${user?.username}'s Team` || "");
+
+  const handleCreateTeam = async () => {
+    if (!user) {
+      toast.error("Couldn't fetch user info");
+      return;
+    }
+
+    try {
+      const { data: teamData, error: teamError } = await supabase
+        .from("teams")
+        .insert([{ name: teamName, created_by: user.id }]) 
+        .select()
+        .single();
+
+      if (teamError) throw teamError;
+      if (!teamData) return;
+
+      const { error: memberError } = await supabase
+        .from("team_members")
+        .insert([{ team_id: teamData.id, user_id: user.id, role: "owner" }]);
+
+      if (memberError) throw memberError;
+
+      toast.success(`Team "${teamName}" created successfully 🎉`);
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+  };
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
@@ -28,13 +62,23 @@ export const JoinTeamDialog = () => {
           <h3 className="font-Inter text-md my-6 text-white">
             Fill the details to create a new team.
           </h3>
-          <div className="bg-primary-bg w-full rounded shadow-xl p-4">
-            Lorem ipsum dolor sit amet.
-          </div>
+          <DynamicInput
+            label="Team Name"
+            labelFor="teamName"
+            onChangeFn={handleCreateTeam}
+            setValue={setTeamName}
+            value={teamName}
+            type="text"
+          />
         </div>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Continue</AlertDialogAction>
+          <AlertDialogAction
+            className="bg-primary-bg silver-border cursor-pointer"
+            onClick={handleCreateTeam}
+          >
+            Create team
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
