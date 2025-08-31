@@ -9,6 +9,11 @@ export const Appearance = () => {
         personal settings do not affect what others see.
       </p>
       <Boxes />
+      <img
+        src="https://app.eraser.io/static/images/settingsModal/darkBg.svg"
+        alt=""
+        className="h-[20rem] w-[60rem] object-fill object-center"
+      />
     </div>
   );
 };
