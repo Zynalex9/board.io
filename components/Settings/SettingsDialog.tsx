@@ -1,4 +1,5 @@
-import React from "react";
+"use client";
+import React, { useState } from "react";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -7,7 +8,10 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Settings } from "lucide-react";
 import { ButtonsComp } from "./ButtonsComp";
+import { ActivePanel } from "./Panels/ActivePanel";
 export const SettingsDialog = () => {
+  const [activeTab, setActiveTab] = useState<string>("teamMember");
+
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
@@ -32,9 +36,11 @@ export const SettingsDialog = () => {
         <div className="h-px w-full bg-gray-400/40"></div>
         <div className="flex flex-grow px-6">
           <div className="w-1/5 h-full">
-            <ButtonsComp />
+            <ButtonsComp setActiveTab={setActiveTab} activeTab={activeTab} />
           </div>
-          <div className="w-4/5 h-full"></div>
+          <div className="w-4/5 h-full">
+            <ActivePanel activePanel={activeTab} />
+          </div>
         </div>
       </AlertDialogContent>
     </AlertDialog>

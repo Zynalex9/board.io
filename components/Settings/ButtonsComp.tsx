@@ -4,8 +4,13 @@ import { FaUsers, FaMoneyBill, FaGitAlt, FaEye } from "react-icons/fa";
 import { TbSettingsCog } from "react-icons/tb";
 import { CustomButton } from "./CustomButton";
 import { CgProfile } from "react-icons/cg";
-export const ButtonsComp = () => {
-  const [activeTab, setActiveTab] = useState<string>("teamMember");
+export const ButtonsComp = ({
+  activeTab,
+  setActiveTab,
+}: {
+  activeTab: string;
+  setActiveTab: React.Dispatch<React.SetStateAction<string>>;
+}) => {
 
   const data = [
     {
@@ -41,6 +46,7 @@ export const ButtonsComp = () => {
       Icon: FaEye,
     },
   ];
+  console.log(activeTab);
   return (
     <div>
       <h2 className="text-[8px] font-semibold font-Inter text-white mb-3">

@@ -17,6 +17,7 @@ import { getUser } from "@/store/userSlice";
 import { ArrowDown, LogOut, Settings, Users } from "lucide-react";
 import { JoinTeamDialog } from "../Join/JoinTeamDialog";
 import { SettingsDialog } from "../Settings/SettingsDialog";
+import { Profile } from "./Profile";
 export function Name() {
   const dispatch = useDispatch<AppDispatch>();
   const getUserData = async () => {
@@ -78,21 +79,7 @@ export function Name() {
         </div>
         <DropdownMenuSeparator className="bg-gray-500" />
         <DropdownMenuItem>
-          <div className="flex items-center gap-3  rounded-xl shadow-md">
-            <img
-              src={user?.avatar_url || "/Profile_avatar_placeholder_large.png"}
-              alt="profile picture"
-              className="w-10 h-10 rounded-full object-cover border border-gray-700"
-            />
-            <div className="flex flex-col">
-              <h2 className="text-sm font-bold text-white font-Inter">
-                {user?.username || "Guest User"}
-              </h2>
-              <h2 className="text-xs text-gray-400 font-Inter">
-                {user?.email || "guest@example.com"}
-              </h2>
-            </div>
-          </div>
+          <Profile user={user}/>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
