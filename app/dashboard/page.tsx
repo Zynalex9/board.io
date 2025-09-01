@@ -18,15 +18,12 @@ export default function DashboardPage() {
 
   return (
     <div className="h-screen flex flex-col items-center justify-center bg-black text-white">
-      {/* Title */}
       <h1 className="text-5xl font-bold mb-8">Board.io</h1>
 
-      {/* Loading bar */}
       <div className="w-64 h-2 bg-gray-800 rounded-full overflow-hidden">
         <div className="h-full w-full bg-gradient-to-r from-indigo-500 via-blue-500 to-purple-500 animate-[loading_2s_linear_infinite]" />
       </div>
 
-      {/* Animation keyframes */}
       <style jsx>{`
         @keyframes loading {
           0% {

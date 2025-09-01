@@ -1,14 +1,16 @@
 "use client";
+import { SidebarCompProps } from "@/types/allTypes";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import React from "react";
 
-export const AllFiles = () => {
+export const AllFiles = ({ teams }: SidebarCompProps) => {
   const pathname = usePathname();
   const isActive = (href: string) => pathname === href;
-
+  const { teamId } = useParams();
+  const team = teams?.find((team) => team.teams.id === teamId);
   return (
-    <Link href={"/dashboard"} className={`no-underline `}>
+    <Link href={`/dashboard/${team?.teams.id}`} className={`no-underline `}>
       <div
         className={`flex items-center justify-between mt-6 mb-2 w-full px-4 py-1.5 ${
           isActive("/dashboard")

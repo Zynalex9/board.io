@@ -143,3 +143,7 @@ export interface IMemberTeam {
   role: TeamRole;
   teams: Team;
 }
+export interface SidebarCompProps {
+  teams: IMemberTeam[] | undefined;
+  user: User | null;
+}
