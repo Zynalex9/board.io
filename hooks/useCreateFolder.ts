@@ -1,6 +1,4 @@
-import { supabase } from "@/lib/supabase";
 import { createFolder } from "@/Queries/folder";
-import { IFolder } from "@/types/allTypes";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
