@@ -1,3 +1,4 @@
+import { Whiteboard } from "@/hooks/getWhiteboard";
 import { supabase } from "@/lib/supabase";
 export interface CreateFile {
   name: string;
@@ -25,7 +26,7 @@ export const getFoldersWhiteboards = async (
   if (error) throw new Error(error.message);
   return whiteboards ?? [];
 };
-export const createWhiteboard = async (data: CreateFile) => {
+export const createWhiteboard = async (data: CreateFile):Promise<Whiteboard[]> => {
   const { data: whiteboard, error: whiteboardError } = await supabase
     .from("whiteboards")
     .insert([data])
