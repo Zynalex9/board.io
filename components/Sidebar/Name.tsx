@@ -1,51 +1,25 @@
 "use client";
 import * as React from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { AppDispatch, RootState } from "@/store/store";
-import { getUser } from "@/store/userSlice";
-import { ArrowDown, LogOut, Settings, Users } from "lucide-react";
+import { ArrowDown, LogOut } from "lucide-react";
 import { JoinTeamDialog } from "../Join/JoinTeamDialog";
 import { SettingsDialog } from "../Settings/SettingsDialog";
 import { Profile } from "./Profile";
-import { supabase } from "@/lib/supabase";
-import { toast } from "sonner";
-import { IMemberTeam } from "@/types/allTypes";
-import { useQuery } from "@tanstack/react-query";
-import { fetchTeams } from "@/Queries/teams";
+import { useUser } from "@/hooks/useUser";
+import { useTeams } from "@/hooks/useTeams";
+import { useParams } from "next/navigation";
+import Link from "next/link";
 export function Name() {
-  const dispatch = useDispatch<AppDispatch>();
-  const getUserData = async () => {
-    try {
-      await dispatch(getUser());
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const { user } = useSelector((state: RootState) => state.auth);
-  React.useEffect(() => {
-    if (!user) {
-      getUserData();
-    }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch]);
-  const { data: teams } = useQuery({
-    queryKey: ["teams", user?.id],
-    queryFn: () => fetchTeams(user!.id),
-    enabled: !!user,
-  });
+  const { data: user } = useUser();
+  const { data: teams } = useTeams(user);
+  const { teamId } = useParams();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -73,9 +47,15 @@ export function Name() {
         {teams &&
           teams.length > 0 &&
           teams.map((team) => (
-            <DropdownMenuItem className="text-white my-1 bg-blue-600 text-sm rounded-md cursor-pointer font-Inter px-1.5 py-1">
-              {team.teams.name}
-            </DropdownMenuItem>
+            <Link href={`/dashboard/${team.teams.id}`}>
+              <DropdownMenuItem
+                className={`text-white  ${
+                  team.teams.id === teamId && "bg-blue-600"
+                } text-sm rounded-md cursor-pointer font-Inter px-1.5 py-1`}
+              >
+                {team.teams.name}
+              </DropdownMenuItem>
+            </Link>
           ))}
         <DropdownMenuSeparator className="bg-gray-500" />
         <div className="space-y-2 px-2 py-2">
