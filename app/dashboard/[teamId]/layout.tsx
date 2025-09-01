@@ -1,9 +1,9 @@
 import React from "react";
 import { Sidebar } from "./Sidebar";
 import { AllBoxes } from "@/components/DashboardLayout/AllBoxes";
-import { ReduxProvider } from "../providers";
 import { Topbar } from "@/components/DashboardTopbar/TopBar";
-import ReactQueryProviders from "../QueryProvider";
+import { ReduxProvider } from "@/app/providers";
+import ReactQueryProviders from "@/app/QueryProvider";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
