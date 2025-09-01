@@ -1,4 +1,5 @@
 "use client";
+import { useFolder } from "@/hooks/useFolder";
 import { isActiveLink } from "@/lib/helper";
 import { SidebarCompProps } from "@/types/allTypes";
 import { FolderPlus } from "lucide-react";
@@ -9,13 +10,14 @@ export const SingleFolder = ({ teams, user }: SidebarCompProps) => {
   const pathname = usePathname();
   const { teamId } = useParams();
   const team = teams?.find((team) => team.teams.id === teamId);
+  const { data: folders } = useFolder(team?.teams.id!);
   return (
     <div className="text-sm leading-tight font-Inter space-y-2 h-64 overflow-y-auto">
-      {Array.from({ length: 5 }).map((_, idx) => (
+      {folders?.map((folder, idx) => (
         <div
           className={`flex items-center justify-between w-full ${
             isActiveLink(
-              `/dashboard/${team?.teams.id}/folders/untitled${idx + 1}`,
+              `/dashboard/${team?.teams.id}/folders/${folder.id}`,
               pathname
             )
               ? "px-4 py-1.5 bg-[#2A2B2B] text-white border-gray-500 border-[0.5px] rounded-lg"
@@ -24,13 +26,13 @@ export const SingleFolder = ({ teams, user }: SidebarCompProps) => {
           key={idx}
         >
           <Link
-            href={`/dashboard/${team?.teams.id}/folders/untitled${idx + 1}`}
+            href={`/dashboard/${team?.teams.id}/folders/${folder.id}`}
             className={`block`}
           >
-            Untitled Folder {idx + 1}
+            {folder.name}
           </Link>
           {isActiveLink(
-            `/dashboard/${team?.teams.id}/folders/untitled${idx + 1}`,
+            `/dashboard/${team?.teams.id}/folders/${folder.id}`,
             pathname
           ) && <FolderPlus size={16} className="font-thin cursor-pointer" />}
         </div>

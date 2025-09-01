@@ -147,3 +147,12 @@ export interface SidebarCompProps {
   teams: IMemberTeam[] | undefined;
   user: User | null;
 }
+export interface IFolder {
+  id: string; 
+  team_id: string; 
+  parent_id: string | null; 
+  name: string;
+  created_by: string; 
+  created_at: string; 
+  updated_at?: string; 
+}
