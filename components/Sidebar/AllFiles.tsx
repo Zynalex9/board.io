@@ -13,7 +13,7 @@ export const AllFiles = ({ teams }: SidebarCompProps) => {
     <Link href={`/dashboard/${team?.teams.id}`} className={`no-underline `}>
       <div
         className={`flex items-center justify-between mt-6 mb-2 w-full px-4 py-1.5 ${
-          isActive("/dashboard")
+          isActive(`/dashboard/${team?.teams.id}`)
             ? "text-white font-bold bg-[#2A2B2B] border-gray-500 border-[0.5px] rounded-lg"
             : "text-gray-300 font-normal hover:text-white"
         } px-2 py-2 hover:bg-[#2A2B2B] text-white rounded transition-all duration-100`}

@@ -20,6 +20,7 @@ export function Name() {
   const { data: user } = useUser();
   const { data: teams } = useTeams(user);
   const { teamId } = useParams();
+  const team = teams?.find((team) => team.teams.id === teamId);
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -38,7 +39,7 @@ export function Name() {
                 d="M891.3,0L1646,0c38.8,0,62.8,55,42.7,98.2L1443,628.9c-9,19.5-25.2,31.4-42.7,31.4h-509V0z"
               ></path>
             </svg>
-            <h1 className="font-Inter">{user?.username}'s Team</h1>
+            <h1 className="font-Inter">{team?.teams.name}</h1>
             <ArrowDown size={28} />
           </Button>
         )}
