@@ -10,7 +10,7 @@ import { toast } from "sonner";
 
 export const SingleFolder = ({ teams, user }: SidebarCompProps) => {
   const pathname = usePathname();
-  const { teamId } = useParams();
+  const { teamId, folderId } = useParams();
   const team = teams?.find((team) => team.teams.id === teamId);
   const { data: folders } = useFolder(team?.teams.id!);
   const { mutate: createFile, isPending } = useCreateWhiteboard();
@@ -22,9 +22,10 @@ export const SingleFolder = ({ teams, user }: SidebarCompProps) => {
     createFile({
       team_id: team?.teams.id!,
       name: "New Whiteboard",
-      folder_id: null,
+      folder_id: folderId as string,
       created_by: user.id,
     });
+    toast.success("File created successfully");
   };
   return (
     <div className="text-sm leading-tight font-Inter space-y-2 h-64 overflow-y-auto px-1">
