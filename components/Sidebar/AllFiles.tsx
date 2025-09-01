@@ -1,14 +1,31 @@
 "use client";
+import { useCreateWhiteboard } from "@/hooks/useCreateWhiteboard";
 import { SidebarCompProps } from "@/types/allTypes";
+import { FilePlus2 } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import React from "react";
+import { toast } from "sonner";
 
-export const AllFiles = ({ teams }: SidebarCompProps) => {
+export const AllFiles = ({ teams, user }: SidebarCompProps) => {
   const pathname = usePathname();
   const isActive = (href: string) => pathname === href;
   const { teamId } = useParams();
   const team = teams?.find((team) => team.teams.id === teamId);
+  const { mutate: createFile, isPending } = useCreateWhiteboard();
+  const handleFileCreate = async () => {
+    if (!user) {
+      toast.error("Something went wrong");
+      return;
+    }
+    createFile({
+      team_id: team?.teams.id!,
+      name: "New Whiteboard",
+      folder_id: null,
+      created_by: user.id,
+    });
+    toast.success("File created successfully");
+  };
   return (
     <Link href={`/dashboard/${team?.teams.id}`} className={`no-underline `}>
       <div
@@ -34,7 +51,7 @@ export const AllFiles = ({ teams }: SidebarCompProps) => {
           </svg>
           <h1>All Files</h1>
         </div>
-        A
+        <FilePlus2 size={16} onClick={handleFileCreate} />
       </div>
     </Link>
   );
