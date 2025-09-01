@@ -142,5 +142,4 @@ export interface IMemberTeam {
   joined_at: Date;
   role: TeamRole;
   teams: Team;
-  user: User;
 }

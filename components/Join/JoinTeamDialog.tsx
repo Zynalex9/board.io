@@ -14,38 +14,47 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const JoinTeamDialog = () => {
   const { user } = useSelector((state: RootState) => state.auth);
   const [teamName, setTeamName] = useState(`${user?.username}'s Team` || "");
 
-  const handleCreateTeam = async () => {
-    if (!user) {
-      toast.error("Couldn't fetch user info");
-      return;
-    }
+  const queryClient = useQueryClient();
+  const createTeam = async ({
+    name,
+    userId,
+  }: {
+    name: string;
+    userId: string;
+  }) => {
+    const { data: teamData, error: teamError } = await supabase
+      .from("teams")
+      .insert([{ name, created_by: userId }])
+      .select()
+      .single();
 
-    try {
-      const { data: teamData, error: teamError } = await supabase
-        .from("teams")
-        .insert([{ name: teamName, created_by: user.id }]) 
-        .select()
-        .single();
+    if (teamError) throw new Error(teamError.message);
 
-      if (teamError) throw teamError;
-      if (!teamData) return;
+    const { error: memberError } = await supabase
+      .from("team_members")
+      .insert([{ team_id: teamData.id, user_id: userId, role: "owner" }]);
 
-      const { error: memberError } = await supabase
-        .from("team_members")
-        .insert([{ team_id: teamData.id, user_id: user.id, role: "owner" }]);
+    if (memberError) throw new Error(memberError.message);
 
-      if (memberError) throw memberError;
-
-      toast.success(`Team "${teamName}" created successfully 🎉`);
-    } catch (error: any) {
-      toast.error(error.message);
-    }
+    return teamData;
   };
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: ({ name, userId }: { name: string; userId: string }) =>
+      createTeam({ name, userId }),
+    onSuccess: () => {
+      toast.success("Team created successfully 🎉");
+      queryClient.invalidateQueries({ queryKey: ["teams"] }); 
+    },
+    onError: (error: any) => toast.error(error.message),
+  });
+
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
@@ -65,19 +74,25 @@ export const JoinTeamDialog = () => {
           <DynamicInput
             label="Team Name"
             labelFor="teamName"
-            onChangeFn={handleCreateTeam}
-            setValue={setTeamName}
+            setValue={setTeamName} 
             value={teamName}
             type="text"
           />
         </div>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
           <AlertDialogAction
+            disabled={isPending}
             className="bg-primary-bg silver-border cursor-pointer"
-            onClick={handleCreateTeam}
+            onClick={() => {
+              if (!user) {
+                toast.error("Couldn't fetch user info");
+                return;
+              }
+              mutate({ name: teamName, userId: user.id }); 
+            }}
           >
-            Create team
+            {isPending ? "Creating..." : "Create team"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

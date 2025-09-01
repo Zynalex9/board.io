@@ -13,7 +13,7 @@ export const DynamicInput = ({
 }: {
   value: string;
   setValue: React.Dispatch<React.SetStateAction<string>>;
-  onChangeFn: () => void;
+  onChangeFn?: () => void;
   label: string;
   labelFor: string;
   type: string;
@@ -26,7 +26,7 @@ export const DynamicInput = ({
         type={type}
         id={labelFor}
         placeholder={placeholder || `Enter your ${label}`}
-        onKeyDown={(e) => e.key === "Enter" && onChangeFn()}
+        onKeyDown={(e) => e.key === "Enter" && onChangeFn()? onChangeFn : null}
         onChange={(e) => setValue(e.target.value)}
         value={value}
         className="bg-primary-bg silver-border"

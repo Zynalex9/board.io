@@ -21,6 +21,8 @@ import { Profile } from "./Profile";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { IMemberTeam } from "@/types/allTypes";
+import { useQuery } from "@tanstack/react-query";
+import { fetchTeams } from "@/Queries/teams";
 export function Name() {
   const dispatch = useDispatch<AppDispatch>();
   const getUserData = async () => {
@@ -36,36 +38,14 @@ export function Name() {
     if (!user) {
       getUserData();
     }
-    if (user) {
-      getTeams();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
-  const [teams, setTeams] = React.useState<IMemberTeam[]>([]);
-  const getTeams = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("team_members")
-        .select(
-          `
-              role,
-              joined_at,
-              teams:team_id (
-                id, name, created_by, created_at
-              )
-            `
-        )
-        .eq("user_id", user?.id);
 
-      if (error) throw error;
-      setTeams(data ?? []);
-    } catch (error: any) {
-      toast.error(error.message);
-    }
-  };
-  React.useEffect(() => {
-    console.log(teams);
-  }, [teams]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch]);
+  const { data: teams } = useQuery({
+    queryKey: ["teams", user?.id],
+    queryFn: () => fetchTeams(user!.id),
+    enabled: !!user,
+  });
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -90,7 +70,8 @@ export function Name() {
         )}
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56 bg-[#171717] border-[0.5px] border-gray-400">
-        {teams.length > 0 &&
+        {teams &&
+          teams.length > 0 &&
           teams.map((team) => (
             <DropdownMenuItem className="text-white my-1 bg-blue-600 text-sm rounded-md cursor-pointer font-Inter px-1.5 py-1">
               {team.teams.name}
