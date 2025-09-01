@@ -1,12 +1,11 @@
 "use client";
 import { Input } from "@/components/ui/input";
-import { RootState } from "@/store/store";
+import { useUser } from "@/hooks/useUser";
 import React from "react";
-import { useSelector } from "react-redux";
 
 export const ImageRight = () => {
-  const { user } = useSelector((state: RootState) => state.auth);
-
+  const { data: user } = useUser();
+  console.log('user: ',user)
   return (
     <div className="w-[30%] flex flex-col items-center gap-3">
       <img

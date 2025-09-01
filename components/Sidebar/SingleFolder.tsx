@@ -2,7 +2,7 @@
 import { useFolder } from "@/hooks/useFolder";
 import { isActiveLink } from "@/lib/helper";
 import { SidebarCompProps } from "@/types/allTypes";
-import { FolderPlus } from "lucide-react";
+import { Folder, FolderPlus } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 
@@ -12,7 +12,7 @@ export const SingleFolder = ({ teams, user }: SidebarCompProps) => {
   const team = teams?.find((team) => team.teams.id === teamId);
   const { data: folders } = useFolder(team?.teams.id!);
   return (
-    <div className="text-sm leading-tight font-Inter space-y-2 h-64 overflow-y-auto">
+    <div className="text-sm leading-tight font-Inter space-y-2 h-64 overflow-y-auto px-1">
       {folders?.map((folder, idx) => (
         <div
           className={`flex items-center justify-between w-full ${
@@ -29,6 +29,7 @@ export const SingleFolder = ({ teams, user }: SidebarCompProps) => {
             href={`/dashboard/${team?.teams.id}/folders/${folder.id}`}
             className={`block`}
           >
+            <Folder size={16} className="font-thin cursor-pointer inline-block mx-2" />
             {folder.name}
           </Link>
           {isActiveLink(

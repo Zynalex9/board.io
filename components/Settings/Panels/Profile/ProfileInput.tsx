@@ -1,11 +1,10 @@
 "use client";
 import { DynamicInput } from "@/components/Reuseable/DynamicInput";
-import { RootState } from "@/store/store";
+import { useUser } from "@/hooks/useUser";
 import React from "react";
-import { useSelector } from "react-redux";
 
 export const ProfileInput = () => {
-  const { user } = useSelector((state: RootState) => state.auth);
+  const { data: user } = useUser();
   const [username, setUsername] = React.useState(user?.username || "");
   const [email, setEmail] = React.useState(user?.email || "");
   return (
