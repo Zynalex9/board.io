@@ -9,6 +9,7 @@ export interface Whiteboard {
 }
 import {
   getAllTableWhiteboards,
+  getFolderTableWhiteboards,
   getTeamWhiteboards,
 } from "@/Queries/whiteboard";
 import { useQuery } from "@tanstack/react-query";
@@ -20,10 +21,17 @@ export function useTeamWhiteboards(teamId: string) {
     enabled: !!teamId,
   });
 }
-export function useAllTableWhiteboards(teamId: string, userId: string) {
+export function useAllTableWhiteboards(teamId: string) {
   return useQuery({
     queryKey: ["allTableWhiteboards", teamId],
-    queryFn: () => getAllTableWhiteboards(teamId, userId),
+    queryFn: () => getAllTableWhiteboards(teamId),
+    enabled: !!teamId,
+  });
+}
+export function useFolderTableWhiteboards(teamId: string,folderId:string) {
+  return useQuery({
+    queryKey: ["allFolderTableWhiteboards", teamId],
+    queryFn: () => getFolderTableWhiteboards(teamId, folderId),
     enabled: !!teamId,
   });
 }

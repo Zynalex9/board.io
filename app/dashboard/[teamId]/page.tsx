@@ -10,7 +10,7 @@ export default function page() {
   const { data: user } = useUser();
   const { data: teams } = useTeams(user);
   const { teamId } = useTeamId({ teams });
-  const { data: whiteboards } = useAllTableWhiteboards(teamId!, user?.id);
+  const { data: whiteboards } = useAllTableWhiteboards(teamId!);
   return (
     <div className="">
       <Table  data={whiteboards}/>

@@ -46,15 +46,30 @@ export const createWhiteboard = async (
 };
 export const getAllTableWhiteboards = async (
   teamId: string,
-  userId: string
-) :Promise<IAllTableData[] | null>=> {
+): Promise<IAllTableData[] | null> => {
+  const { data, error } = await supabase
+    .from("whiteboards")
+    .select(
+      "id,name,created_at,updated_at,team_id, board_members(role, joined_at, users(avatar_url))"
+    )
+    .eq("team_id", teamId);
+  if (error) {
+    console.error("Error fetching boards:", error);
+    return null;
+  }
+  return data;
+};
+export const getFolderTableWhiteboards = async (
+  teamId: string,
+  folderId: string
+): Promise<IAllTableData[] | null> => {
   const { data, error } = await supabase
     .from("whiteboards")
     .select(
       "id,name,created_at,updated_at,team_id, board_members(role, joined_at, users(avatar_url))"
     )
     .eq("team_id", teamId)
-    .eq("created_by", userId);
+    .eq("folder_id", folderId);
   if (error) {
     console.error("Error fetching boards:", error);
     return null;
