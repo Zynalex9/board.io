@@ -36,6 +36,7 @@ export const useCreateWhiteboard = () => {
 
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["whiteboards"] });
+      queryClient.invalidateQueries({ queryKey: ["allTableWhiteboards"] });
     },
   });
 };

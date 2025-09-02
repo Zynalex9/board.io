@@ -148,11 +148,25 @@ export interface SidebarCompProps {
   user: User | null;
 }
 export interface IFolder {
-  id: string; 
-  team_id: string; 
-  parent_id: string | null; 
+  id: string;
+  team_id: string;
+  parent_id: string | null;
   name: string;
-  created_by: string; 
-  created_at: string; 
-  updated_at?: string; 
+  created_by: string;
+  created_at: string;
+  updated_at?: string;
+}
+export interface IAllTableData {
+  created_at: string;
+  id: string;
+  name: string;
+  team_id: string;
+  updated_at: string;
+  board_members: {
+    joined_at: string;
+    role: string;
+    users: {
+      avatar_url: string;
+    };
+  }[];
 }
