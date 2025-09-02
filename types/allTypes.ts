@@ -159,6 +159,7 @@ export interface IFolder {
 export interface IAllTableData {
   created_at: string;
   id: string;
+  folder_id:string;
   name: string;
   team_id: string;
   updated_at: string;

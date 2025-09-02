@@ -1,22 +1,70 @@
 "use client";
 import { IAllTableData } from "@/types/allTypes";
 import { formatDistanceToNow } from "date-fns";
-import { Delete, Ellipsis, Link, Move, Pencil, Share } from "lucide-react";
+import { Ellipsis, Link, Move, Pencil, Share } from "lucide-react";
 import React from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { CgDuplicate } from "react-icons/cg";
 import { BsTrash } from "react-icons/bs";
+import { toast } from "sonner";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { EditFileName } from "@/Queries/file";
 export const TableBody = ({
   data,
 }: {
   data: IAllTableData[] | null | undefined;
 }) => {
+  const [isEditing, setIsEditing] = React.useState("");
+  const [newName, setNewName] = React.useState("");
+  const handleCopy = (link: string) => {
+    navigator.clipboard.writeText(link);
+    toast.success("Link Copied", {
+      position: "bottom-left",
+    });
+  };
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: ({ newName, file }: { newName: string; file: IAllTableData }) =>
+      EditFileName(file.id, newName),
+    onSettled: (_, __, { file }) => {
+      queryClient.invalidateQueries({
+        queryKey: ["allFolderTableWhiteboards", file.team_id, file.folder_id],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["allTableWhiteboards", file.team_id],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["whiteboards", file.team_id],
+      });
+    },
+  });
+
+  const handleRename = (file: IAllTableData) => {
+    if (newName === file.name) return;
+    if (!newName) {
+      toast.error("Enter a new name");
+      return;
+    }
+    mutation.isPending && toast.loading("Renaming...");
+    mutation.mutate(
+      { newName, file },
+      {
+        onSuccess: () => {
+          toast.success("Renamed Successfully");
+          setIsEditing("");
+        },
+        onError: (err: any) => {
+          toast.error(err.message || "Something went wrong");
+        },
+      }
+    );
+  };
+
   return (
     <tbody className="divide-y divide-gray-700 text-sm text-gray-300">
       {data &&
@@ -33,7 +81,24 @@ export const TableBody = ({
               key={file.id}
               className="hover:bg-[#1E1E1E] transition-colors cursor-pointer"
             >
-              <td className="px-4 py-3 truncate">{file.name}</td>
+              <td className="py-3 truncate">
+                {isEditing === file.id ? (
+                  <div>
+                    <input
+                      type="text"
+                      placeholder="Enter folder name"
+                      className="flex-1 bg-transparent border border-neutral-600 focus:border-blue-500 text-white rounded-md px-3 py-2 outline-none"
+                      defaultValue={file.name}
+                      onChange={(e) => setNewName(e.target.value)}
+                      autoFocus
+                      onBlur={() => setIsEditing("")}
+                      onKeyDown={(e) => e.key === "Enter" && handleRename(file)}
+                    />
+                  </div>
+                ) : (
+                  file.name
+                )}
+              </td>
               <td className="px-4 py-3">
                 {formatDistanceToNow(new Date(file.created_at), {
                   addSuffix: true,
@@ -79,7 +144,14 @@ export const TableBody = ({
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="bg-[#171717] silver-border shadow-xl">
                       <DropdownMenuItem>
-                        <button className="flex items-center gap-1 hovered cursor-pointer w-full">
+                        <button
+                          className="flex items-center gap-1 hovered cursor-pointer w-full"
+                          onClick={() =>
+                            handleCopy(
+                              `${window.location.origin}/dashboard/board/${file.id}`
+                            )
+                          }
+                        >
                           <Link />
                           <span className="ml-2 text-xs">Copy Link</span>
                         </button>
@@ -87,7 +159,12 @@ export const TableBody = ({
                       <DropdownMenuItem>
                         <button className="flex items-center gap-1 hovered cursor-pointer w-full">
                           <Pencil />
-                          <span className="ml-2 text-xs">Rename</span>
+                          <span
+                            className="ml-2 text-xs"
+                            onClick={() => setIsEditing(file.id)}
+                          >
+                            Rename
+                          </span>
                         </button>
                       </DropdownMenuItem>
                       <DropdownMenuItem>

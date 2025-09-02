@@ -30,7 +30,7 @@ export function useAllTableWhiteboards(teamId: string) {
 }
 export function useFolderTableWhiteboards(teamId: string,folderId:string) {
   return useQuery({
-    queryKey: ["allFolderTableWhiteboards", teamId],
+    queryKey: ["allFolderTableWhiteboards", teamId,folderId],
     queryFn: () => getFolderTableWhiteboards(teamId, folderId),
     enabled: !!teamId,
   });
