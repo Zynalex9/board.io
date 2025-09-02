@@ -24,6 +24,16 @@
   border: 0.25px solid rgba(192, 192, 192, 0.4); /* faded opacity */
   border-radius: 6px;
 }
+.hovered {
+  padding: 1.5px 2px;
+  color: white;              /* text-white */
+  border-radius: 0.25rem;     /* rounded (default Tailwind = 4px) */
+  transition: all 100ms;      /* transition-all duration-100 */
+}
+
+.hovered:hover {
+  background-color: #2A2B2B;  /* hover:bg-[#2A2B2B] */
+}
 
 @media (prefers-color-scheme: dark) {
   :root {

@@ -15,8 +15,8 @@ export const Table = ({
             <th className="px-4 py-3 font-medium w-2/5">Name</th>
             <th className="px-4 py-3 font-medium w-1/5">Created</th>
             <th className="px-4 py-3 font-medium w-1/5">Edited</th>
-            <th className="px-4 py-3 font-medium w-[15%]">Members</th>
-            <th className="px-4 py-3 font-medium w-[25%]">Author</th>
+            <th className="px-4 py-3 font-medium w-[10%]">Members</th>
+            <th className="px-4 py-3 font-medium w-[30%]">Author</th>
           </tr>
         </thead>
         <TableBody data={data} />

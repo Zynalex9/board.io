@@ -1,8 +1,17 @@
+"use client";
 import { IAllTableData } from "@/types/allTypes";
 import { formatDistanceToNow } from "date-fns";
-import { Ellipsis } from "lucide-react";
+import { Delete, Ellipsis, Link, Move, Pencil, Share } from "lucide-react";
 import React from "react";
-
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { CgDuplicate } from "react-icons/cg";
+import { BsTrash } from "react-icons/bs";
 export const TableBody = ({
   data,
 }: {
@@ -49,7 +58,7 @@ export const TableBody = ({
                   <p className="text-center">-</p>
                 )}
               </td>
-              <td className="px-4 py-3">
+              <td className="px-2 py-3">
                 <div className="flex items-center gap-1">
                   {owner?.avatar_url ? (
                     <img
@@ -60,11 +69,55 @@ export const TableBody = ({
                   ) : (
                     <img
                       src="/Profile_avatar_placeholder_large.png"
-                      className="size-5 rounded-full object-cover object-center border border-gray-600"
+                      className="size-8 rounded-full object-cover object-center border border-gray-600"
                       alt="author avatar"
                     />
                   )}
-                  <Ellipsis size={14} />
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Ellipsis size={25} className="hovered p-1" />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="bg-[#171717] silver-border shadow-xl">
+                      <DropdownMenuItem>
+                        <button className="flex items-center gap-1 hovered cursor-pointer w-full">
+                          <Link />
+                          <span className="ml-2 text-xs">Copy Link</span>
+                        </button>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <button className="flex items-center gap-1 hovered cursor-pointer w-full">
+                          <Pencil />
+                          <span className="ml-2 text-xs">Rename</span>
+                        </button>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <button className="flex items-center gap-1 hovered cursor-pointer w-full">
+                          <Share />
+                          <span className="ml-2 text-xs">Share</span>
+                        </button>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <button className="flex items-center gap-1 hovered cursor-pointer w-full">
+                          <Move />
+                          <span className="ml-2 text-xs">Move</span>
+                        </button>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <button className="flex items-center gap-1 hovered cursor-pointer w-full">
+                          <CgDuplicate />
+                          <span className="ml-2 text-xs">Duplicate</span>
+                        </button>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <button className="flex items-center gap-1 hovered cursor-pointer w-full">
+                          <BsTrash className="text-red-500" />
+                          <span className="ml-2 text-xs text-red-500">
+                            Delete
+                          </span>
+                        </button>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </td>
             </tr>
