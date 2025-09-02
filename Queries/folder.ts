@@ -8,7 +8,7 @@ export const fetchFolders = async (teamId: string): Promise<IFolder[]> => {
     .order("created_at", { ascending: false });
   if (error) throw new Error(error.message);
   return data ?? [];
-}; 
+};
 export const createFolder = async ({
   teamId,
   name,
@@ -33,3 +33,14 @@ export const createFolder = async ({
     return error.message;
   }
 };
+export async function changeFolderName(folderId: string, newName: string) {
+  const { data, error } = await supabase
+    .from("folders")
+    .update({ name: newName })
+    .eq("id", folderId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
