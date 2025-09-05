@@ -11,6 +11,7 @@ import {
 import { Link, QrCode, Share } from "lucide-react";
 import { ShareTypeDropdown } from "./ShareType";
 import { AcessType } from "./AccessType";
+import { InvitesSection } from "./InvitesSection";
 export const ShareComponent = () => {
   return (
     <AlertDialog>
@@ -51,7 +52,16 @@ export const ShareComponent = () => {
         <div>
           <h1 className="font-semibold font-Inter text-xl">Settings</h1>
           <ShareTypeDropdown />
-          <AcessType/>
+          <AcessType />
+          <div className="mt-6">
+            <InvitesSection />
+          </div>
+          <div className="mt-7 bg-primary-bg p-4 silver-border rounded-md mx-3">
+            <p className="text-sm">
+              Invitees can always view and edit files, regardless of the file
+              share settings.
+            </p>
+          </div>
         </div>
       </AlertDialogContent>
     </AlertDialog>
