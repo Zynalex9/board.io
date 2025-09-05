@@ -14,6 +14,7 @@ import { BsTrash } from "react-icons/bs";
 import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { EditFileName } from "@/Queries/file";
+import { ShareComponent } from "./ShareComponent";
 export const TableBody = ({
   data,
 }: {
@@ -167,11 +168,8 @@ export const TableBody = ({
                           </span>
                         </button>
                       </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <button className="flex items-center gap-1 hovered cursor-pointer w-full">
-                          <Share />
-                          <span className="ml-2 text-xs">Share</span>
-                        </button>
+                      <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                        <ShareComponent />
                       </DropdownMenuItem>
                       <DropdownMenuItem>
                         <button className="flex items-center gap-1 hovered cursor-pointer w-full">
