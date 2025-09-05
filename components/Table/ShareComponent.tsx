@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Link, QrCode, Share } from "lucide-react";
 import { ShareTypeDropdown } from "./ShareType";
+import { AcessType } from "./AccessType";
 export const ShareComponent = () => {
   return (
     <AlertDialog>
@@ -50,6 +51,7 @@ export const ShareComponent = () => {
         <div>
           <h1 className="font-semibold font-Inter text-xl">Settings</h1>
           <ShareTypeDropdown />
+          <AcessType/>
         </div>
       </AlertDialogContent>
     </AlertDialog>

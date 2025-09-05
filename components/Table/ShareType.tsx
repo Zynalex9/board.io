@@ -14,10 +14,7 @@ export function ShareTypeDropdown() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="outline"
-          className="flex items-center gap-1 bg-[#171717] silver-border my-1.5"
-        >
+        <Button className="flex items-center gap-1 rounded-none  bg-primary-bg my-1.5">
           Open <ChevronDown />{" "}
         </Button>
       </DropdownMenuTrigger>
