@@ -33,7 +33,7 @@ export const SingleFolder = ({ teams, user }: SidebarCompProps) => {
   const { data: whiteboards } = useTeamWhiteboards(team?.teams.id!);
 
   return (
-    <div className="text-sm leading-tight font-Inter space-y-2 h-64 overflow-y-auto px-1">
+    <div className="text-sm leading-tight font-Inter space-y-2 h-64 overflow-y-auto minimal-scrollbar px-1">
       {folders?.map((folder, idx) => (
         <div>
           <div

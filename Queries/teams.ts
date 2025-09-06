@@ -36,3 +36,11 @@ export const fetchUser = async () => {
   if (error) throw error;
   return profile;
 };
+export const fetchTeamWithMembers = async (teamId: string) => {
+  const { data, error } = await supabase
+    .from("team_members")
+    .select("*, user:user_id(*), team:team_id(*)")
+    .eq("team_id", teamId);
+  if (error) throw error;
+  return data;
+};

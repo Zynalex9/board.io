@@ -19,7 +19,7 @@ export interface Team {
   updated_at: Date;
 }
 
-export type TeamRole = "owner" | "admin" | "member";
+export type TeamRole = "owner" | "admin" | "member" | "pending";
 
 export interface TeamMember {
   id: string;
@@ -159,7 +159,7 @@ export interface IFolder {
 export interface IAllTableData {
   created_at: string;
   id: string;
-  folder_id:string;
+  folder_id: string;
   name: string;
   team_id: string;
   updated_at: string;
@@ -170,4 +170,13 @@ export interface IAllTableData {
       avatar_url: string;
     };
   }[];
+}
+export interface ITeamWithMembers {
+  created_at: string;
+  id: string;
+  team: Team;
+  role: TeamRole;
+  team_id: string;
+  user: User;
+  user_id: string;
 }
