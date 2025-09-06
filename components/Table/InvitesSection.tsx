@@ -4,8 +4,9 @@ import { DynamicInput } from "../Reuseable/DynamicInput";
 import { toast } from "sonner";
 import { Profile } from "../Sidebar/Profile";
 import { SelectBox } from "../Settings/Panels/Team/SelectBox";
+import { IAllTableData } from "@/types/allTypes";
 
-export const InvitesSection = () => {
+export const InvitesSection = ({ file }: { file: IAllTableData   }) => {
   const [email, setEmail] = useState("");
   const data = [
     {

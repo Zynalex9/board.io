@@ -20,6 +20,7 @@ export const TableBody = ({
 }: {
   data: IAllTableData[] | null | undefined;
 }) => {
+  console.log("dataaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", data);
   const [isEditing, setIsEditing] = React.useState("");
   const [newName, setNewName] = React.useState("");
   const handleCopy = (link: string) => {
@@ -115,7 +116,11 @@ export const TableBody = ({
                   members.map((member, i) => (
                     <img
                       key={i}
-                      src={member.users.avatar_url}
+                      src={
+                        member?.users?.avatar_url
+                          ? member?.users?.avatar_url
+                          : "/Profile_avatar_placeholder_large.png"
+                      }
                       className="size-5 rounded-full object-cover object-center border border-gray-600"
                       alt="member avatar"
                     />
@@ -169,7 +174,7 @@ export const TableBody = ({
                         </button>
                       </DropdownMenuItem>
                       <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                        <ShareComponent />
+                        <ShareComponent file={file} />
                       </DropdownMenuItem>
                       <DropdownMenuItem>
                         <button className="flex items-center gap-1 hovered cursor-pointer w-full">
