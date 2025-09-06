@@ -20,7 +20,6 @@ export const TableBody = ({
 }: {
   data: IAllTableData[] | null | undefined;
 }) => {
-  console.log("dataaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", data);
   const [isEditing, setIsEditing] = React.useState("");
   const [newName, setNewName] = React.useState("");
   const handleCopy = (link: string) => {

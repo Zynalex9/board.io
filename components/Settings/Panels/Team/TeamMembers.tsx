@@ -104,7 +104,7 @@ export const TeamMembers = () => {
           </div>
         </div>
         <div className="bg-primary-bg rounded-xl p-4 mt-14 w-1/2 h-36 flex">
-          <InviteBox />
+          <InviteBox  />
         </div>
       </div>
     </div>
