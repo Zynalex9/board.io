@@ -50,7 +50,7 @@ export const getAllTableWhiteboards = async (
   const { data, error } = await supabase
     .from("whiteboards")
     .select(
-      "id,name,created_at,updated_at,team_id,folder_id, board_members(role, joined_at, users(avatar_url))"
+      "id,name,created_at,updated_at,team_id,folder_id, board_members(role, joined_at, users(*))"
     )
     .eq("team_id", teamId)
     .order("created_at", { ascending: false });

@@ -30,6 +30,7 @@ export const TableBody = ({
       position: "bottom-left",
     });
   };
+  console.log('file',data)
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: ({ newName, file }: { newName: string; file: IAllTableData }) =>

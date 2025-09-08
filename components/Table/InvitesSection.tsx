@@ -8,78 +8,6 @@ import { IAllTableData } from "@/types/allTypes";
 
 export const InvitesSection = ({ file }: { file: IAllTableData   }) => {
   const [email, setEmail] = useState("");
-  const data = [
-    {
-      id: "1",
-      username: "Zain",
-      email: "zain123@gmail.com",
-      avatar_url: "",
-      role: "Admin",
-    },
-    {
-      id: "2",
-      username: "Ayesha",
-      email: "ayesha.khan@gmail.com",
-      avatar_url: "",
-      role: "pending",
-    },
-    {
-      id: "3",
-      username: "Bilal",
-      email: "bilal92@hotmail.com",
-      avatar_url: "",
-      role: "Viewer",
-    },
-    {
-      id: "4",
-      username: "Fatima",
-      email: "fatima.shah@gmail.com",
-      avatar_url: "",
-      role: "Admin",
-    },
-    {
-      id: "5",
-      username: "Usman",
-      email: "usman.dev@yahoo.com",
-      avatar_url: "",
-      role: "Editor",
-    },
-    {
-      id: "6",
-      username: "Hira",
-      email: "hira.ali@gmail.com",
-      avatar_url: "",
-      role: "Viewer",
-    },
-    {
-      id: "7",
-      username: "Omar",
-      email: "omar.tech@gmail.com",
-      avatar_url: "",
-      role: "Editor",
-    },
-    {
-      id: "8",
-      username: "Sana",
-      email: "sana.farooq@gmail.com",
-      avatar_url: "",
-      role: "Viewer",
-    },
-    {
-      id: "9",
-      username: "Hamza",
-      email: "hamza.dev@gmail.com",
-      avatar_url: "",
-      role: "Admin",
-    },
-    {
-      id: "10",
-      username: "Maryam",
-      email: "maryam.design@gmail.com",
-      avatar_url: "",
-      role: "Editor",
-    },
-  ];
   return (
     <div>
       <DynamicInput
@@ -94,10 +22,10 @@ export const InvitesSection = ({ file }: { file: IAllTableData   }) => {
           setEmail("");
         }}
       />
-      <div className="h-36 overflow-y-auto space-y-4 mt-4 px-2 minimal-scrollbar">
-        {data.map((user) => (
+      <div className="max-h-36 overflow-y-auto space-y-4 mt-4 px-2 minimal-scrollbar">
+        {file.board_members.map((user) => (
           <div className="flex items-center justify-between">
-            <Profile user={user} />
+            <Profile user={user.users} />
             {user.role === "pending" ? (
               <SelectBox />
             ) : (

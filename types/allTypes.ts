@@ -6,7 +6,7 @@ export interface User {
   email: string;
   password: string;
   created_at: Date;
-  name: string;
+  username: string;
   avatar_url: string;
   updated_at: Date;
 }
@@ -166,9 +166,7 @@ export interface IAllTableData {
   board_members: {
     joined_at: string;
     role: string;
-    users: {
-      avatar_url: string;
-    };
+    users: User
   }[];
 }
 export interface ITeamWithMembers {

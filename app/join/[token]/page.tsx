@@ -33,14 +33,13 @@ export default function JoinPage() {
         return;
       }
 
-      // Add user to the board
       const { error: memberError } = await supabase
         .from("board_members")
         .insert([
           {
             board_id: linkInfo.target_id,
             user_id: user.id,
-            role: "editor", // or whatever default role you want
+            role: "editor",
             joined_at: new Date().toISOString(),
           },
         ]);
