@@ -2,6 +2,7 @@ interface Idata {
   folderId: string;
   newName: string;
 }
+import { supabase } from "@/lib/supabase";
 import { changeFolderName, fetchFolders } from "@/Queries/folder";
 import { IFolder } from "@/types/allTypes";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -46,6 +47,30 @@ export const useUpdateFolderName = () => {
 
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["folders"] });
+    },
+  });
+};
+export const useDeleteFolder = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (folderId: string) => {
+      console.log("Heloo");
+      const { error } = await supabase.rpc("delete_folder", {
+        target_folder: folderId,
+      });
+      if (error) {
+        toast.error(error.message);
+        throw new Error(error.message);
+      }
+    },
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["whiteboards"] });
+      queryClient.invalidateQueries({ queryKey: ["folders"] });
+      queryClient.invalidateQueries({ queryKey: ["allTableWhiteboards"] });
+      queryClient.invalidateQueries({
+        queryKey: ["allFolderTableWhiteboards"],
+      });
     },
   });
 };

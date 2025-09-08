@@ -1,15 +1,21 @@
 "use client";
 
-import { useFolder, useUpdateFolderName } from "@/hooks/useFolder";
+import { useCreateWhiteboard } from "@/hooks/useCreateWhiteboard";
+import {
+  useDeleteFolder,
+  useFolder,
+  useUpdateFolderName,
+} from "@/hooks/useFolder";
 import { useTeamId } from "@/hooks/useTeamId";
 import { useTeams } from "@/hooks/useTeams";
 import { useUser } from "@/hooks/useUser";
-import { Check, X, Ellipsis, FilePlus2 } from "lucide-react";
-import { useParams } from "next/navigation";
+import { Check, X, FilePlus2, Trash } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
 export const FolderTopBar = () => {
+  const router = useRouter();
   const [folderName, setFolderName] = useState("");
   const { data: user } = useUser();
   const { data: teams } = useTeams(user);
@@ -37,6 +43,20 @@ export const FolderTopBar = () => {
 
     setIsEditing(false);
   };
+  const { mutate: createWhiteboard } = useCreateWhiteboard();
+  const handleCreateWhiteBoard = () => {
+    if (!user || !teamId) {
+      toast.error("Something went wrong");
+      return;
+    }
+    createWhiteboard({
+      team_id: teamId,
+      name: "New Whiteboard",
+      folder_id: folderId as string,
+      created_by: user.id,
+    });
+  };
+  const { mutate: FolderDelete } = useDeleteFolder();
   return (
     <div className="flex items-center justify-between px-4 py-2 border-b border-neutral-800 bg-[#1f1f1f] rounded-lg">
       {isEditing ? (
@@ -74,8 +94,18 @@ export const FolderTopBar = () => {
           >
             {folder?.name}
           </h2>
-          <Ellipsis className="w-5 h-5 text-neutral-400 cursor-pointer hover:text-white" />
-          <FilePlus2 className="w-5 h-5 text-neutral-400 cursor-pointer hover:text-white" />
+          <Trash
+            onClick={() => {
+              FolderDelete(folderId as string);
+              toast.success("Folder deleted successfully");
+              router.push(`/dashboard/${teamId}`);
+            }}
+            className="w-5 h-5 text-red-500 cursor-pointer hover:text-red-600"
+          />
+          <FilePlus2
+            onClick={handleCreateWhiteBoard}
+            className="w-5 h-5 text-neutral-400 cursor-pointer hover:text-white"
+          />
         </div>
       )}
     </div>
