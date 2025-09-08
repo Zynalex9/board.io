@@ -1,7 +1,13 @@
+"use client";
 import React from "react";
 import { TeamNameInput } from "./TeamNameInput";
+import { useDeleteTeam } from "@/hooks/useTeams";
+import { useParams, useRouter } from "next/navigation";
 
 export const TeamSettings = () => {
+  const { mutate: deleteTeam, isPending } = useDeleteTeam();
+  const { teamId } = useParams();
+  const router = useRouter();
   return (
     <div>
       <h1 className="font-Inter text-2xl">Basic Information</h1>
@@ -13,8 +19,27 @@ export const TeamSettings = () => {
         <p className="text-sm">
           Proceed with caution, once completed, these actions cannot be undone.
         </p>
-        <button className="mb-5 silver-border px-2 py-1.5 bg-black text-white cursor-pointer hover:bg-black/50">
-          Delete Team
+        <button
+          onClick={() => {
+            try {
+              deleteTeam(teamId as string);
+            } catch (error) {
+              console.log("error", error);
+            }finally {
+              router.push("/dashboard");
+            }
+          }}
+          disabled={isPending}
+          className="mb-5 silver-border px-2 py-1.5 bg-black text-white cursor-pointer hover:bg-black/50"
+        >
+          {isPending ? (
+            <div className="flex items-center gap-2">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="text-white">Deleting team...</p>
+            </div>
+          ) : (
+            "Delete Team"
+          )}
         </button>
       </div>
     </div>
