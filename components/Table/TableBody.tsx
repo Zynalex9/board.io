@@ -15,6 +15,8 @@ import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { EditFileName } from "@/Queries/file";
 import { ShareComponent } from "./ShareComponent";
+import { useDeleteFolder } from "@/hooks/useFolder";
+import { useDeleteWhiteboard } from "@/hooks/useCreateWhiteboard";
 export const TableBody = ({
   data,
 }: {
@@ -65,7 +67,7 @@ export const TableBody = ({
       }
     );
   };
-
+  const { mutate:DeleteWhiteboard } = useDeleteWhiteboard();
   return (
     <tbody className="divide-y divide-gray-700 text-sm text-gray-300">
       {data &&
@@ -188,7 +190,7 @@ export const TableBody = ({
                         </button>
                       </DropdownMenuItem>
                       <DropdownMenuItem>
-                        <button className="flex items-center gap-1 hovered cursor-pointer w-full">
+                        <button onClick={() => DeleteWhiteboard(file.id)} className="flex items-center gap-1 hovered cursor-pointer w-full">
                           <BsTrash className="text-red-500" />
                           <span className="ml-2 text-xs text-red-500">
                             Delete

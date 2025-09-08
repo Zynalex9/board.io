@@ -1,3 +1,4 @@
+import { supabase } from "@/lib/supabase";
 import { CreateFile, createWhiteboard } from "@/Queries/whiteboard";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -37,7 +38,31 @@ export const useCreateWhiteboard = () => {
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["whiteboards"] });
       queryClient.invalidateQueries({ queryKey: ["allTableWhiteboards"] });
-      queryClient.invalidateQueries({ queryKey: ["allFolderTableWhiteboards"] });
+      queryClient.invalidateQueries({
+        queryKey: ["allFolderTableWhiteboards"],
+      });
+    },
+  });
+};
+export const useDeleteWhiteboard = () => {
+  const queryClient = useQueryClient();
+return  useMutation({
+    mutationFn: async (boardId: string) => {
+      const { error } = await supabase.rpc("delete_whiteboard", {
+        whiteboard_id: boardId,
+      });
+      if (error) {
+        toast.error(error.message);
+        throw new Error(error.message);
+      }
+      toast.success("Deleted Successfully");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["whiteboards"] });
+      queryClient.invalidateQueries({ queryKey: ["allTableWhiteboards"] });
+      queryClient.invalidateQueries({
+        queryKey: ["allFolderTableWhiteboards"],
+      });
     },
   });
 };
