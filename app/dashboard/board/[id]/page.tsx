@@ -1,6 +1,6 @@
 "use client";
 import { KonvaEventObject } from "konva/lib/Node";
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Sidebar } from "../components/Sidebar";
 import { DrawType } from "@/types/allTypes";
 import {
@@ -14,9 +14,10 @@ import {
   Transformer,
 } from "react-konva";
 import { v4 as uuidv4 } from "uuid";
-import { saveBoardElement } from "@/lib/helper";
 import { useParams } from "next/navigation";
 import { useUser } from "@/hooks/useUser";
+import { getSingleBoard, saveBoardElement } from "@/Queries/board";
+import { useGetSingleBoard } from "@/hooks/getWhiteboard";
 
 interface Shape {
   id: string;
@@ -25,6 +26,8 @@ interface Shape {
 }
 
 export default function page() {
+  const { id: boardId } = useParams();
+  const { data: board, isLoading:loading, error } = useGetSingleBoard(boardId as string);
   const [drawAction, setDrawAction] = useState<DrawType>(DrawType.Select);
   const [shapes, setShapes] = useState<Shape[]>([]);
   const [editingText, setEditingText] = useState<{
@@ -33,7 +36,6 @@ export default function page() {
     y: number;
     text: string;
   } | null>(null);
-  const { id: boardId } = useParams();
   const { data: user } = useUser();
   const stageRef = useRef<any>(null);
   const transformerRef = useRef<any>(null);
@@ -214,7 +216,6 @@ export default function page() {
     },
     [drawAction]
   );
-
   const onBgClick = useCallback(() => {
     transformerRef.current.nodes([]);
     transformerRef.current.getLayer().batchDraw();
@@ -231,7 +232,13 @@ export default function page() {
   }, []);
 
   const isDraggable = drawAction === DrawType.Select;
-
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-primary-bg2 text-white">
+        Loading board...
+      </div>
+    );
+  }
   return (
     <div className="relative min-h-screen bg-primary-bg2">
       <div className="fixed left-5 top-10 z-50 pointer-events-auto">

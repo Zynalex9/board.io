@@ -1,5 +1,8 @@
 // ========================
 // User & Teams
+
+import { Whiteboard } from "@/hooks/getWhiteboard";
+
 // ========================
 export interface User {
   id: string;
@@ -178,6 +181,17 @@ export interface ITeamWithMembers {
   user: User;
   user_id: string;
 }
+
+export interface SingleBoard {
+  board: Whiteboard;
+  board_id: string;
+  created_at: string;
+  created_by: string;
+  id: string;
+  name: string;
+  team_id: string;
+  updated_at: string;
+}
 // ========================
 // Board types
 // ========================
@@ -192,32 +206,110 @@ export enum DrawType {
   Scribble = "scribble",
 }
 export interface RectangleProps {
-  id: string;        
-  x: number;         
+  x: number;
   y: number;
-  width: number;     
-  height: number;    
-  fill?: string;     
-  stroke?: string;   
-  strokeWidth?: number;
-  rotation?: number;
-  opacity?: number;
-  isSelected?: boolean; 
+  width: number;
+  height: number;
+  stroke: string;
+  strokeWidth: number;
+  fill: string;
 }
+
 export interface CircleProps {
-  id: string;        
-  x: number;         
+  x: number;
   y: number;
   radius: number;
-  fill?: string;     
-  stroke?: string;   
-  strokeWidth?: number;
-  rotation?: number;
-  opacity?: number;
-  isSelected?: boolean; 
+  stroke: string;
+  strokeWidth: number;
+  fill: string;
+}
+
+export interface LineProps {
+  points: number[];
+  stroke: string;
+  strokeWidth: number;
+}
+
+export interface ArrowProps extends LineProps {
+  pointerLength: number;
+  pointerWidth: number;
+}
+
+export interface ScribbleProps extends LineProps {
+  lineCap: "round" | "square";
+  lineJoin: "round" | "bevel" | "miter";
+}
+
+export interface TextProps {
+  x: number;
+  y: number;
+  text: string;
+  fontSize: number;
+  fill: string;
+  draggable?: boolean;
+}
+export type newBoardElement =
+  | {
+      id: string;
+      type: "rectangle";
+      properties: RectangleProps;
+      board_id: string;
+      created_by: string;
+      created_at: string;
+      updated_at: string;
+    }
+  | {
+      id: string;
+      type: "circle";
+      properties: CircleProps;
+      board_id: string;
+      created_by: string;
+      created_at: string;
+      updated_at: string;
+    }
+  | {
+      id: string;
+      type: "line";
+      properties: LineProps;
+      board_id: string;
+      created_by: string;
+      created_at: string;
+      updated_at: string;
+    }
+  | {
+      id: string;
+      type: "arrow";
+      properties: ArrowProps;
+      board_id: string;
+      created_by: string;
+      created_at: string;
+      updated_at: string;
+    }
+  | {
+      id: string;
+      type: "scribble";
+      properties: ScribbleProps;
+      board_id: string;
+      created_by: string;
+      created_at: string;
+      updated_at: string;
+    }
+  | {
+      id: string;
+      type: "text";
+      properties: TextProps;
+      board_id: string;
+      created_by: string;
+      created_at: string;
+      updated_at: string;
+    };
+
+export interface SingleBoard {
+  board: Whiteboard;
+  elements: newBoardElement[];
 }
 export interface Shape {
   id: string;
   type: DrawType;
-  properties: any; 
+  properties: newBoardElement["properties"];
 }

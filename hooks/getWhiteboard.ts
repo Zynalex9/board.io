@@ -7,6 +7,7 @@ export interface Whiteboard {
   team_id: string;
   updated_at: string;
 }
+import { getSingleBoard } from "@/Queries/board";
 import {
   getAllTableWhiteboards,
   getFolderTableWhiteboards,
@@ -28,10 +29,18 @@ export function useAllTableWhiteboards(teamId: string) {
     enabled: !!teamId,
   });
 }
-export function useFolderTableWhiteboards(teamId: string,folderId:string) {
+export function useFolderTableWhiteboards(teamId: string, folderId: string) {
   return useQuery({
-    queryKey: ["allFolderTableWhiteboards", teamId,folderId],
+    queryKey: ["allFolderTableWhiteboards", teamId, folderId],
     queryFn: () => getFolderTableWhiteboards(teamId, folderId),
     enabled: !!teamId,
+  });
+}
+
+export function useGetSingleBoard(boardId: string) {
+  return useQuery({
+    queryKey: ["SingleBoard", boardId],
+    queryFn: () => getSingleBoard(boardId),
+    enabled: !!boardId,
   });
 }
