@@ -25,6 +25,9 @@
   border: 0.25px solid rgba(192, 192, 192, 0.4); /* faded opacity */
   border-radius: 6px;
 }
+.silver-border-nr {
+  border: 0.25px solid rgba(192, 192, 192, 0.4); /* faded opacity */
+}
 .hovered {
   padding: 1.5px 2px;
   color: white;              /* text-white */

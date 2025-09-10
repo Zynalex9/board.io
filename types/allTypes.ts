@@ -166,7 +166,7 @@ export interface IAllTableData {
   board_members: {
     joined_at: string;
     role: string;
-    users: User
+    users: User;
   }[];
 }
 export interface ITeamWithMembers {
@@ -177,4 +177,17 @@ export interface ITeamWithMembers {
   team_id: string;
   user: User;
   user_id: string;
+}
+// ========================
+// Board types
+// ========================
+export enum DrawType {
+  Select = "select",
+  Text = "text",
+  Image = "image",
+  Arrow = "arrow",
+  Rectangle = "rectangle",
+  Circle = "circle",
+  Line = "line",
+  Scribble = "scribble",
 }
