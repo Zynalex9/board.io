@@ -2,326 +2,161 @@
 import { KonvaEventObject } from "konva/lib/Node";
 import React, { useCallback, useRef, useState } from "react";
 import { Sidebar } from "../components/Sidebar";
-import { CircleProps, DrawType, RectangleProps } from "@/types/allTypes";
-import {
-  Circle,
-  Layer,
-  Rect,
-  Stage,
-  Line,
-  Arrow,
-  Text,
-  Transformer,
-} from "react-konva";
-
+import { DrawType } from "@/types/allTypes";
+import { Stage, Layer, Rect, Circle, Line, Arrow, Text, Transformer } from "react-konva";
 import { v4 as uuidv4 } from "uuid";
+
+interface Shape {
+  id: string;
+  type: DrawType;
+  properties: any;
+}
+
 export default function page() {
   const [drawAction, setDrawAction] = useState<DrawType>(DrawType.Select);
-  const [rectangles, setRectangles] = useState<RectangleProps[]>([]);
-  const [circles, setCircles] = useState<CircleProps[]>([]);
-  const [lines, setLines] = useState<any[]>([]);
-  const [arrows, setArrows] = useState<any[]>([]);
-  const [texts, setTexts] = useState<any[]>([]);
-  const [editingText, setEditingText] = useState<{
-    id: string;
-    x: number;
-    y: number;
-    text: string;
-  } | null>(null);
-  const [scribbles, setScribbles] = useState<any[]>([]);
+  const [shapes, setShapes] = useState<Shape[]>([]);
+  const [editingText, setEditingText] = useState<{ id: string; x: number; y: number; text: string } | null>(null);
 
   const stageRef = useRef<any>(null);
+  const transformerRef = useRef<any>(null);
   const currentShapeRef = useRef<string>("");
   const isPaintRef = useRef(false);
-  const transformerRef = useRef<any>(null);
-  const onStageMouseDown = useCallback(async () => {
+  const onStageMouseDown = useCallback(() => {
     if (drawAction === DrawType.Select) return;
-    isPaintRef.current = true;
     const stage = stageRef.current;
     const pos = stage.getPointerPosition();
-    const x = pos.x || 0;
-    const y = pos.y || 0;
-    const id = uuidv4();
-    currentShapeRef.current = id;
-    switch (drawAction) {
-      case DrawType.Rectangle: {
-        setRectangles((prev) => [
-          ...prev,
-          {
-            id,
-            x,
-            y,
-            width: 1,
-            height: 1,
-            fill: "transparent",
-            stroke: "white",
-            strokeWidth: 2,
-          },
-        ]);
-        break;
-      }
-      case DrawType.Circle: {
-        setCircles((prev) => [
-          ...prev,
-          {
-            id,
-            x,
-            y,
-            radius: 1,
-            fill: "transparent",
-            stroke: "white",
-            strokeWidth: 2,
-          },
-        ]);
-        break;
-      }
-      case DrawType.Line: {
-        setLines((prev) => [
-          ...prev,
-          { id, points: [x, y, x, y], stroke: "white", strokeWidth: 2 },
-        ]);
-        break;
-      }
-      case DrawType.Arrow: {
-        setArrows((prev) => [
-          ...prev,
-          {
-            id,
-            points: [x, y, x, y],
-            stroke: "white",
-            strokeWidth: 2,
-            pointerLength: 10,
-            pointerWidth: 10,
-          },
-        ]);
-        break;
-      }
-      case DrawType.Scribble: {
-        setScribbles((prev) => [
-          ...prev,
-          {
-            id,
-            points: [x, y],
-            stroke: "white",
-            strokeWidth: 2,
-            lineCap: "round",
-            lineJoin: "round",
-          },
-        ]);
-        break;
-      }
-      case DrawType.Text: {
-        setTexts((prev) => [
-          ...prev,
-          {
-            id,
-            x,
-            y,
-            text: "Double-click to edit",
-            fontSize: 18,
-            fill: "white",
-            draggable: true,
-          },
-        ]);
-        isPaintRef.current = false;
-        setDrawAction(DrawType.Select);
-        break;
-      }
-    }
-  }, [drawAction]);
-
-  const onStageMouseMove = useCallback(async () => {
-    if (drawAction === DrawType.Select || !isPaintRef.current) return;
-    const stage = stageRef?.current;
-    const id = currentShapeRef.current;
-    const pos = stage?.getPointerPosition();
     const x = pos?.x || 0;
     const y = pos?.y || 0;
+    const id = uuidv4();
+    currentShapeRef.current = id;
+
+    let newShape: Shape;
+
     switch (drawAction) {
-      case DrawType.Rectangle: {
-        setRectangles((prev) =>
-          prev.map((r) =>
-            r.id === id ? { ...r, width: x - r.x, height: y - r.y } : r
-          )
-        );
+      case DrawType.Rectangle:
+        newShape = { id, type: DrawType.Rectangle, properties: { x, y, width: 1, height: 1, stroke: "white", strokeWidth: 2, fill: "transparent" } };
         break;
-      }
-      case DrawType.Circle: {
-        setCircles((prev) =>
-          prev.map((c) =>
-            c.id === id
-              ? { ...c, radius: Math.sqrt((x - c.x) ** 2 + (y - c.y) ** 2) }
-              : c
-          )
-        );
+      case DrawType.Circle:
+        newShape = { id, type: DrawType.Circle, properties: { x, y, radius: 1, stroke: "white", strokeWidth: 2, fill: "transparent" } };
         break;
-      }
-      case DrawType.Line: {
-        setLines((prev) =>
-          prev.map((l) =>
-            l.id === id ? { ...l, points: [l.points[0], l.points[1], x, y] } : l
-          )
-        );
+      case DrawType.Line:
+        newShape = { id, type: DrawType.Line, properties: { points: [x, y, x, y], stroke: "white", strokeWidth: 2 } };
         break;
-      }
-      case DrawType.Arrow: {
-        setArrows((prev) =>
-          prev.map((a) =>
-            a.id === id ? { ...a, points: [a.points[0], a.points[1], x, y] } : a
-          )
-        );
+      case DrawType.Arrow:
+        newShape = { id, type: DrawType.Arrow, properties: { points: [x, y, x, y], stroke: "white", strokeWidth: 2, pointerLength: 10, pointerWidth: 10 } };
         break;
-      }
-      case DrawType.Scribble: {
-        setScribbles((prev) =>
-          prev.map((s) =>
-            s.id === id ? { ...s, points: [...s.points, x, y] } : s
-          )
-        );
+      case DrawType.Scribble:
+        newShape = { id, type: DrawType.Scribble, properties: { points: [x, y], stroke: "white", strokeWidth: 2, lineCap: "round", lineJoin: "round" } };
         break;
-      }
+      case DrawType.Text:
+        newShape = { id, type: DrawType.Text, properties: { x, y, text: "Double-click to edit", fontSize: 18, fill: "white", draggable: true } };
+        break;
+      default:
+        return;
     }
+
+    setShapes(prev => [...prev, newShape]);
+    isPaintRef.current = drawAction !== DrawType.Text;
+  }, [drawAction]);
+  const onStageMouseMove = useCallback(() => {
+    if (drawAction === DrawType.Select || !isPaintRef.current) return;
+
+    const stage = stageRef.current;
+    const pos = stage.getPointerPosition();
+    const x = pos?.x || 0;
+    const y = pos?.y || 0;
+    const id = currentShapeRef.current;
+
+    setShapes(prev =>
+      prev.map(shape => {
+        if (shape.id !== id) return shape;
+
+        switch (shape.type) {
+          case DrawType.Rectangle:
+            return { ...shape, properties: { ...shape.properties, width: x - shape.properties.x, height: y - shape.properties.y } };
+          case DrawType.Circle:
+            return { ...shape, properties: { ...shape.properties, radius: Math.sqrt((x - shape.properties.x) ** 2 + (y - shape.properties.y) ** 2) } };
+          case DrawType.Line:
+          case DrawType.Arrow:
+            return { ...shape, properties: { ...shape.properties, points: [shape.properties.points[0], shape.properties.points[1], x, y] } };
+          case DrawType.Scribble:
+            return { ...shape, properties: { ...shape.properties, points: [...shape.properties.points, x, y] } };
+          default:
+            return shape;
+        }
+      })
+    );
   }, [drawAction]);
   const onStageMouseUp = useCallback(() => {
     isPaintRef.current = false;
   }, []);
-  const onShapeClick = useCallback(
-    (e: KonvaEventObject<MouseEvent>) => {
-      if (drawAction !== DrawType.Select) return;
-      const currentTarget = e.currentTarget;
-      transformerRef?.current?.node(currentTarget);
-    },
-    [drawAction]
-  );
-  const isDraggable = drawAction === DrawType.Select;
+  const onShapeClick = useCallback((e: KonvaEventObject<MouseEvent>) => {
+    if (drawAction !== DrawType.Select) return;
+    transformerRef.current.nodes([e.currentTarget]);
+    transformerRef.current.getLayer().batchDraw();
+  }, [drawAction]);
 
-  const onBgClick = useCallback(
-    (e: KonvaEventObject<MouseEvent>) => {
-      transformerRef?.current?.nodes([]);
-    },
-    [drawAction]
-  );
+  const onBgClick = useCallback(() => {
+    transformerRef.current.nodes([]);
+    transformerRef.current.getLayer().batchDraw();
+  }, []);
   const onTextDblClick = useCallback((e: KonvaEventObject<MouseEvent>) => {
     const node = e.target;
     const absPos = node.getAbsolutePosition();
-    setEditingText({
-      id: node.attrs.id,
-      x: absPos.x,
-      y: absPos.y,
-      text: '',
-    });
+    setEditingText({ id: node.attrs.id, x: absPos.x, y: absPos.y, text: (node as import("konva/lib/shapes/Text").Text).text() });
   }, []);
+
+  const isDraggable = drawAction === DrawType.Select;
 
   return (
     <div className="relative min-h-screen bg-primary-bg2">
       <div className="fixed left-5 top-10 z-50 pointer-events-auto">
         <Sidebar drawAction={drawAction} setDrawAction={setDrawAction} />
       </div>
-      <div className="w-full h-screen overflow-auto minimal-scrollbar">
-        {editingText && (
-          <textarea
-            className="absolute bg-transparent border border-gray-400 text-white outline-none resize-none"
-            style={{
-              top: editingText.y,
-              left: editingText.x,
-              position: "absolute",
-              fontSize: "18px",
-              color: "white",
-            }}
-            value={editingText.text}
-            autoFocus
-            onChange={(e) =>
-              setEditingText((prev) =>
-                prev ? { ...prev, text: e.target.value } : null
-              )
-            }
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                setTexts((prev) =>
-                  prev.map((t) =>
-                    t.id === editingText.id
-                      ? { ...t, text: editingText.text }
-                      : t
-                  )
-                );
-                setEditingText(null);
-              }
-            }}
-            onBlur={() => {
-              setTexts((prev) =>
-                prev.map((t) =>
-                  t.id === editingText.id ? { ...t, text: editingText.text } : t
-                )
-              );
-              setEditingText(null);
-            }}
-          />
-        )}
 
+      {editingText && (
+        <textarea
+          className="absolute bg-transparent border border-gray-400 text-white outline-none resize-none"
+          style={{ top: editingText.y, left: editingText.x, fontSize: "18px", color: "white" }}
+          value={editingText.text}
+          autoFocus
+          onChange={e => setEditingText(prev => prev ? { ...prev, text: e.target.value } : null)}
+          onKeyDown={e => {
+            if (e.key === "Enter") {
+              setShapes(prev => prev.map(s => s.id === editingText.id ? { ...s, properties: { ...s.properties, text: editingText.text } } : s));
+              setEditingText(null);
+            }
+          }}
+          onBlur={() => {
+            setShapes(prev => prev.map(s => s.id === editingText.id ? { ...s, properties: { ...s.properties, text: editingText.text } } : s));
+            setEditingText(null);
+          }}
+        />
+      )}
+
+      <div className="w-full h-screen overflow-auto minimal-scrollbar">
         <Stage
           width={window.innerWidth}
           height={window.innerHeight}
-          className="bg-primary-bg2"
           ref={stageRef}
           onMouseDown={onStageMouseDown}
-          onMouseUp={onStageMouseUp}
           onMouseMove={onStageMouseMove}
+          onMouseUp={onStageMouseUp}
           onClick={onBgClick}
         >
           <Layer>
-            {rectangles.map((r) => (
-              <Rect
-                key={r.id}
-                {...r}
-                draggable={isDraggable}
-                onDblClick={onShapeClick}
-              />
-            ))}
-            {circles.map((c) => (
-              <Circle
-                key={c.id}
-                {...c}
-                draggable={isDraggable}
-                onDblClick={onShapeClick}
-              />
-            ))}
-            {lines.map((l) => (
-              <Line
-                key={l.id}
-                {...l}
-                draggable={isDraggable}
-                onDblClick={onShapeClick}
-              />
-            ))}
-            {arrows.map((a) => (
-              <Arrow
-                key={a.id}
-                {...a}
-                draggable={isDraggable}
-                onDblClick={onShapeClick}
-              />
-            ))}
-            {scribbles.map((s) => (
-              <Line
-                key={s.id}
-                {...s}
-                draggable={isDraggable}
-                lineCap="round"
-                lineJoin="round"
-                onDblClick={onShapeClick}
-              />
-            ))}
-            {texts.map((t) => (
-              !editingText &&
-              <Text
-                key={t.id}
-                {...t}
-                id={t.id}
-                draggable={isDraggable}
-                onDblClick={onTextDblClick}
-              />
-            ))}
-
+            {shapes.map(shape => {
+              const props = { key: shape.id, ...shape.properties, draggable: isDraggable, onDblClick: shape.type === DrawType.Text ? onTextDblClick : onShapeClick };
+              switch (shape.type) {
+                case DrawType.Rectangle: return <Rect {...props} />;
+                case DrawType.Circle: return <Circle {...props} />;
+                case DrawType.Line: return <Line {...props} />;
+                case DrawType.Arrow: return <Arrow {...props} />;
+                case DrawType.Scribble: return <Line {...props} lineJoin="round" lineCap="round" />;
+                case DrawType.Text: return <Text {...props} id={shape.id} />;
+                default: return null;
+              }
+            })}
             <Transformer ref={transformerRef} />
           </Layer>
         </Stage>

@@ -216,3 +216,8 @@ export interface CircleProps {
   opacity?: number;
   isSelected?: boolean; 
 }
+export interface Shape {
+  id: string;
+  type: DrawType;
+  properties: any; 
+}
