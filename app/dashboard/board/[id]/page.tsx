@@ -27,7 +27,7 @@ interface Shape {
 
 export default function page() {
   const { id: boardId } = useParams();
-  const { data: board, isLoading:loading, error } = useGetSingleBoard(boardId as string);
+  const { data: board, isLoading:boardLoading, error:boardError } = useGetSingleBoard(boardId as string);
   const [drawAction, setDrawAction] = useState<DrawType>(DrawType.Select);
   const [shapes, setShapes] = useState<Shape[]>([]);
   const [editingText, setEditingText] = useState<{
@@ -198,6 +198,7 @@ export default function page() {
   }, [drawAction]);
   const onStageMouseUp = useCallback(() => {
     isPaintRef.current = false;
+    if(drawAction === DrawType.Select) return;
     console.log(shapes);
     const lastElem = shapes[shapes.length - 1];
     console.log(lastElem);
@@ -230,9 +231,21 @@ export default function page() {
       text: (node as import("konva/lib/shapes/Text").Text).text(),
     });
   }, []);
-
+useEffect(() => {
+  if (board && Array.isArray(board)) {
+    const elements: Shape[] = board.map((elem: any) => ({
+      id: elem.id,
+      type: elem.type as DrawType,
+      properties: elem.properties.properties, 
+    }));
+    setShapes(elements);
+  }
+}, [board]);
+useEffect(() => {
+  console.log(shapes);
+},[shapes])
   const isDraggable = drawAction === DrawType.Select;
-  if (loading) {
+  if (boardLoading) {
     return (
       <div className="flex items-center justify-center h-screen bg-primary-bg2 text-white">
         Loading board...
