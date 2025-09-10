@@ -26,7 +26,7 @@ export const Sidebar = ({ drawAction, setDrawAction }: SidebarProps) => {
      hover:bg-primary-bg w-full`;
 
   return (
-    <div className="w-[3rem] flex flex-col items-center h-[30rem]">
+    <div className="w-[3rem] absolute z-[10000] flex flex-col items-center h-[30rem]">
       <button className="flex items-center justify-center px-2 py-1.5 bg-primary-bg2 silver-border-nr rounded-md text-white hover:bg-primary-bg">
         <Plus />
       </button>

@@ -191,3 +191,28 @@ export enum DrawType {
   Line = "line",
   Scribble = "scribble",
 }
+export interface RectangleProps {
+  id: string;        
+  x: number;         
+  y: number;
+  width: number;     
+  height: number;    
+  fill?: string;     
+  stroke?: string;   
+  strokeWidth?: number;
+  rotation?: number;
+  opacity?: number;
+  isSelected?: boolean; 
+}
+export interface CircleProps {
+  id: string;        
+  x: number;         
+  y: number;
+  radius: number;
+  fill?: string;     
+  stroke?: string;   
+  strokeWidth?: number;
+  rotation?: number;
+  opacity?: number;
+  isSelected?: boolean; 
+}
