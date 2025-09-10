@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { IUser } from "@/store/userSlice";
 import { IMemberTeam } from "@/types/allTypes";
 
 export const fetchTeams = async (userId: string): Promise<IMemberTeam[]> => {
@@ -19,7 +20,7 @@ export const fetchTeams = async (userId: string): Promise<IMemberTeam[]> => {
   return data ?? [];
 };
 
-export const fetchUser = async () => {
+export const fetchUser = async (): Promise<IUser | null> => {
   const {
     data: { user },
     error: authError,
