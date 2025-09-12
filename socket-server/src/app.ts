@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
 import { Server } from "socket.io";
+import { initSocket } from "./socket";
 
 const app = express();
 const PORT = 5000;
@@ -7,11 +8,8 @@ const PORT = 5000;
 const httpServer = app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
-const io = new Server(httpServer, {
-  cors: {
-    origin: "*",
-  },
-});
+const io = initSocket(httpServer);
+
 
 io.on("connection", (socket) => {
   console.log("A user connected:", socket.id);
