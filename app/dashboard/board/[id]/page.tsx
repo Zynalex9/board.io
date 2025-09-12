@@ -18,6 +18,7 @@ import { useParams } from "next/navigation";
 import { useUser } from "@/hooks/useUser";
 import { getSingleBoard, saveBoardElement } from "@/Queries/board";
 import { useGetSingleBoard } from "@/hooks/getWhiteboard";
+import { handleShapeUpdate } from "@/lib/helper";
 
 interface Shape {
   id: string;
@@ -27,7 +28,11 @@ interface Shape {
 
 export default function page() {
   const { id: boardId } = useParams();
-  const { data: board, isLoading:boardLoading, error:boardError } = useGetSingleBoard(boardId as string);
+  const {
+    data: board,
+    isLoading: boardLoading,
+    error: boardError,
+  } = useGetSingleBoard(boardId as string);
   const [drawAction, setDrawAction] = useState<DrawType>(DrawType.Select);
   const [shapes, setShapes] = useState<Shape[]>([]);
   const [editingText, setEditingText] = useState<{
@@ -198,7 +203,7 @@ export default function page() {
   }, [drawAction]);
   const onStageMouseUp = useCallback(() => {
     isPaintRef.current = false;
-    if(drawAction === DrawType.Select) return;
+    if (drawAction === DrawType.Select) return;
     console.log(shapes);
     const lastElem = shapes[shapes.length - 1];
     console.log(lastElem);
@@ -212,15 +217,18 @@ export default function page() {
   const onShapeClick = useCallback(
     (e: KonvaEventObject<MouseEvent>) => {
       if (drawAction !== DrawType.Select) return;
-      transformerRef.current.nodes([e.currentTarget]);
+      transformerRef.current.nodes([e.target]);
       transformerRef.current.getLayer().batchDraw();
     },
     [drawAction]
   );
-  const onBgClick = useCallback(() => {
+
+const onStageClick = useCallback((e: KonvaEventObject<MouseEvent>) => {
+  if (e.target === e.target.getStage()) {
     transformerRef.current.nodes([]);
     transformerRef.current.getLayer().batchDraw();
-  }, []);
+  }
+}, []);
   const onTextDblClick = useCallback((e: KonvaEventObject<MouseEvent>) => {
     const node = e.target;
     const absPos = node.getAbsolutePosition();
@@ -231,19 +239,19 @@ export default function page() {
       text: (node as import("konva/lib/shapes/Text").Text).text(),
     });
   }, []);
-useEffect(() => {
-  if (board && Array.isArray(board)) {
-    const elements: Shape[] = board.map((elem: any) => ({
-      id: elem.id,
-      type: elem.type as DrawType,
-      properties: elem.properties.properties, 
-    }));
-    setShapes(elements);
-  }
-}, [board]);
-useEffect(() => {
-  console.log(shapes);
-},[shapes])
+  useEffect(() => {
+    if (board && Array.isArray(board)) {
+      const elements: Shape[] = board.map((elem: any) => ({
+        id: elem.id,
+        type: elem.type as DrawType,
+        properties: elem.properties.properties,
+      }));
+      setShapes(elements);
+    }
+  }, [board]);
+  useEffect(() => {
+    console.log(shapes);
+  }, [shapes]);
   const isDraggable = drawAction === DrawType.Select;
   if (boardLoading) {
     return (
@@ -313,30 +321,41 @@ useEffect(() => {
           onMouseDown={onStageMouseDown}
           onMouseMove={onStageMouseMove}
           onMouseUp={onStageMouseUp}
-          onClick={onBgClick}
+          onClick={onStageClick}
         >
           <Layer>
             {shapes.map((shape) => {
               const props = {
-                key: shape.id,
+                id: shape.id,
                 ...shape.properties,
                 draggable: isDraggable,
+                onClick: onShapeClick,
                 onDblClick:
-                  shape.type === DrawType.Text ? onTextDblClick : onShapeClick,
+                  shape.type === DrawType.Text ? onTextDblClick : undefined,
+                onDragEnd: (e: KonvaEventObject<DragEvent>) =>
+                  handleShapeUpdate(e, shape.id, false, setShapes),
               };
+
               switch (shape.type) {
-                case DrawType.Rectangle:
-                  return <Rect {...props} />;
-                case DrawType.Circle:
-                  return <Circle {...props} />;
-                case DrawType.Line:
-                  return <Line {...props} />;
                 case DrawType.Arrow:
-                  return <Arrow {...props} />;
+                  return <Arrow key={shape.id} {...props} />;
+                case DrawType.Rectangle:
+                  return <Rect key={shape.id} {...props} />;
+                case DrawType.Circle:
+                  return <Circle key={shape.id} {...props} />;
+                case DrawType.Line:
+                  return <Line key={shape.id} {...props} />;
                 case DrawType.Scribble:
-                  return <Line {...props} lineJoin="round" lineCap="round" />;
+                  return (
+                    <Line
+                      key={shape.id}
+                      {...props}
+                      lineJoin="round"
+                      lineCap="round"
+                    />
+                  );
                 case DrawType.Text:
-                  return <Text {...props} id={shape.id} />;
+                  return <Text key={shape.id} {...props} id={shape.id} />;
                 default:
                   return null;
               }

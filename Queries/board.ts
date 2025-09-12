@@ -28,16 +28,38 @@ export const saveBoardElement = async (
   }
   return data;
 };
-export const getSingleBoard = async (id: string): Promise<SingleBoard[] | PostgrestError> => {
+export const getSingleBoard = async (
+  id: string
+): Promise<SingleBoard[] | PostgrestError> => {
   const { data, error } = await supabase
     .from("board_elements")
     .select("*, board:board_id(*)")
-    .eq("board_id", id)
+    .eq("board_id", id);
   if (error) {
     console.log("Error saving element:", error);
     toast.error(`Error fetching board from database: ${error.message}`);
     return error;
   }
-  console.log(data)
+  console.log(data);
+  return data;
+};
+export const updateBoardElement = async (
+  elem_id: string,
+  updatedProps: any
+) => {
+  const { data, error } = await supabase
+    .from("board_elements")
+    .update({
+      properties: updatedProps,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", elem_id)
+
+  if (error) {
+    console.error("Error updating element:", error);
+    toast.error(`Error updating element in database: ${error.message}`);
+    return error;
+  }
+
   return data;
 };
