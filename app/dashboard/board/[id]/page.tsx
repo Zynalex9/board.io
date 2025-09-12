@@ -19,6 +19,7 @@ import { useUser } from "@/hooks/useUser";
 import { getSingleBoard, saveBoardElement } from "@/Queries/board";
 import { useGetSingleBoard } from "@/hooks/getWhiteboard";
 import { handleShapeUpdate } from "@/lib/helper";
+import { useSocket } from "@/context/socket.context";
 
 interface Shape {
   id: string;
@@ -33,6 +34,7 @@ export default function page() {
     isLoading: boardLoading,
     error: boardError,
   } = useGetSingleBoard(boardId as string);
+  const { socket } = useSocket();
   const [drawAction, setDrawAction] = useState<DrawType>(DrawType.Select);
   const [shapes, setShapes] = useState<Shape[]>([]);
   const [editingText, setEditingText] = useState<{
@@ -223,12 +225,12 @@ export default function page() {
     [drawAction]
   );
 
-const onStageClick = useCallback((e: KonvaEventObject<MouseEvent>) => {
-  if (e.target === e.target.getStage()) {
-    transformerRef.current.nodes([]);
-    transformerRef.current.getLayer().batchDraw();
-  }
-}, []);
+  const onStageClick = useCallback((e: KonvaEventObject<MouseEvent>) => {
+    if (e.target === e.target.getStage()) {
+      transformerRef.current.nodes([]);
+      transformerRef.current.getLayer().batchDraw();
+    }
+  }, []);
   const onTextDblClick = useCallback((e: KonvaEventObject<MouseEvent>) => {
     const node = e.target;
     const absPos = node.getAbsolutePosition();
@@ -250,8 +252,11 @@ const onStageClick = useCallback((e: KonvaEventObject<MouseEvent>) => {
     }
   }, [board]);
   useEffect(() => {
-    console.log(shapes);
-  }, [shapes]);
+    if (!socket) return;
+
+    socket.emit("joinedBoard", boardId);
+  }, [socket, boardId]);
+
   const isDraggable = drawAction === DrawType.Select;
   if (boardLoading) {
     return (
