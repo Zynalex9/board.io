@@ -206,9 +206,9 @@ export default function page() {
   const onStageMouseUp = useCallback(() => {
     isPaintRef.current = false;
     if (drawAction === DrawType.Select) return;
-    console.log(shapes);
     const lastElem = shapes[shapes.length - 1];
-    console.log(lastElem);
+    setDrawAction(DrawType.Select);
+    socket?.emit("newShape", { lastElem, boardId });
     saveBoardElement(
       boardId as string,
       lastElem,
@@ -256,7 +256,31 @@ export default function page() {
 
     socket.emit("joinedBoard", boardId);
   }, [socket, boardId]);
+  useEffect(() => {
+    if (!socket) return;
 
+    const handleDragged = (updatedShape: Shape) => {
+      setShapes((prev) => {
+        const next = prev.map((shape) =>
+          shape.id === updatedShape.id ? updatedShape : shape
+        );
+        return next;
+      });
+    };
+
+    socket.on("shapeDragged", handleDragged);
+
+    return () => {
+      socket.off("shapeDragged", handleDragged);
+    };
+  }, [socket, setShapes]);
+
+  socket?.on("newShape", (lastElem) => {
+    setShapes((prev) => {
+      const exists = prev.some((pv) => pv.id === lastElem.id);
+      return exists ? prev : [...prev, lastElem];
+    });
+  });
   const isDraggable = drawAction === DrawType.Select;
   if (boardLoading) {
     return (
@@ -337,8 +361,9 @@ export default function page() {
                 onClick: onShapeClick,
                 onDblClick:
                   shape.type === DrawType.Text ? onTextDblClick : undefined,
-                onDragEnd: (e: KonvaEventObject<DragEvent>) =>
-                  handleShapeUpdate(e, shape.id, false, setShapes),
+                onDragEnd: (e: KonvaEventObject<DragEvent>) => {
+                  handleShapeUpdate(e, shape.id, false, setShapes, socket,boardId as string);
+                },
               };
 
               switch (shape.type) {

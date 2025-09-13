@@ -1,6 +1,7 @@
 import { KonvaEventObject } from "konva/lib/Node";
 import { updateBoardElement } from "@/Queries/board";
 import { DrawType, Shape } from "@/types/allTypes";
+import { Socket } from "socket.io-client";
 
 export const isActiveLink = (href: string, currentPath: string) => {
   return href === currentPath;
@@ -10,7 +11,9 @@ export const handleShapeUpdate = (
   e: KonvaEventObject<any>,
   id: string,
   isTransform: boolean = false,
-  setShapes: React.Dispatch<React.SetStateAction<Shape[]>>
+  setShapes: React.Dispatch<React.SetStateAction<Shape[]>>,
+  socket: Socket | null,
+  boardId: string
 ) => {
   setShapes((prev) =>
     prev.map((shape) => {
@@ -28,7 +31,7 @@ export const handleShapeUpdate = (
             width: node.width() * node.scaleX(),
             height: node.height() * node.scaleY(),
           };
-          node.scaleX(1); // reset scale to 1
+          node.scaleX(1);
           node.scaleY(1);
         } else if (shape.type === DrawType.Circle) {
           updatedProps = {
@@ -40,10 +43,8 @@ export const handleShapeUpdate = (
           node.scaleX(1);
           node.scaleY(1);
         } else {
-          // for Line/Arrow/Scribble, usually no transform scaling
         }
       } else {
-        // Dragging
         const node = e.target;
         updatedProps = {
           ...updatedProps,
@@ -51,8 +52,11 @@ export const handleShapeUpdate = (
           y: node.y(),
         };
       }
+      socket?.emit("shapeDragged", {
+        shape: { ...shape, properties: updatedProps },
+        boardId,
+      });
 
-      // Call backend
       updateBoardElement(id as string, { ...shape, properties: updatedProps });
 
       return { ...shape, properties: updatedProps };

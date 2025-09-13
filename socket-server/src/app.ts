@@ -10,12 +10,8 @@ const httpServer = app.listen(PORT, () => {
 });
 const io = initSocket(httpServer);
 
-
 io.on("connection", (socket) => {
   console.log("A user connected:", socket.id);
-  socket.on("joinedBoard", (data) => {
-    console.log("joinedboardevent", data);
-  });
   socket.on("disconnect", () => {
     console.log("User disconnected:", socket.id);
   });
