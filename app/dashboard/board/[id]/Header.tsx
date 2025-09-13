@@ -18,7 +18,6 @@ export const EditorHeader = ({
         <span className="text-sm font-medium">Untitled File</span>
         <FaChevronDown className="ml-1 text-xs opacity-70" />
       </div>
-
       <div className="flex items-center gap-5 bg-[#2A2A2A] rounded-md overflow-hidden text-sm">
         {["Document", "Both", "Canvas"].map((tab) => (
           <button
@@ -32,8 +31,6 @@ export const EditorHeader = ({
           </button>
         ))}
       </div>
-
-      {/* Right Side */}
       <div className="flex items-center gap-3">
         <button className="bg-[#2A2A2A] text-xs px-2 py-1 rounded-md">
           Ctrl K
