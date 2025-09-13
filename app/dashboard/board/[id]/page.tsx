@@ -274,11 +274,20 @@ export default function page() {
       SetSelectedShape("");
     };
 
+    const handleLiveDrag = (payload: any) => {
+      const shape: Shape = payload?.shape ?? payload;
+      if (!shape?.id) return;
+      setShapes((prev) => prev.map((s) => (s.id === shape.id ? shape : s)));
+    };
+
     socket.on("shapeDragged", handleDragged);
     socket.on("shapeDeleted", handleDelete);
+    socket.on("shapeDragging", handleLiveDrag);
 
     return () => {
       socket.off("shapeDragged", handleDragged);
+      socket.off("shapeDeleted", handleDelete);
+      socket.off("shapeDragging", handleLiveDrag);
     };
   }, [socket, setShapes]);
 
@@ -303,6 +312,50 @@ export default function page() {
       return exists ? prev : [...prev, lastElem];
     });
   });
+  const dragEmitRef = useRef<{ lastTime: number; timeout?: number }>({
+    lastTime: 0,
+  });
+
+  const emitShapeDragging = useCallback(
+    (shape: Shape) => {
+      if (!socket) return;
+      const now = Date.now();
+      const diff = now - dragEmitRef.current.lastTime;
+      const THROTTLE_MS = 50;
+
+      if (diff >= THROTTLE_MS) {
+        socket.emit("shapeDragging", { shape, boardId });
+        dragEmitRef.current.lastTime = now;
+      } else {
+        if (dragEmitRef.current.timeout) {
+          clearTimeout(dragEmitRef.current.timeout);
+        }
+        dragEmitRef.current.timeout = window.setTimeout(() => {
+          socket.emit("shapeDragging", { shape, boardId });
+          dragEmitRef.current.lastTime = Date.now();
+        }, THROTTLE_MS - diff) as unknown as number;
+      }
+    },
+    [socket, boardId]
+  );
+
+  const handleDragMove = useCallback(
+    (e: KonvaEventObject<DragEvent>, shape: Shape) => {
+      const node = e.target;
+      const updated: Shape = {
+        ...shape,
+        properties: {
+          ...shape.properties,
+          x: node.x(),
+          y: node.y(),
+        },
+      };
+      setShapes((prev) => prev.map((s) => (s.id === updated.id ? updated : s)));
+      emitShapeDragging(updated);
+    },
+    [emitShapeDragging]
+  );
+
   const isDraggable = drawAction === DrawType.Select;
   if (boardLoading) {
     return (
@@ -394,6 +447,8 @@ export default function page() {
                     boardId as string
                   );
                 },
+                onDragMove: (e: KonvaEventObject<DragEvent>) =>
+                  handleDragMove(e, shape),
               };
 
               switch (shape.type) {

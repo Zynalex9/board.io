@@ -27,6 +27,9 @@ export const initSocket = (server: any) => {
     socket.on("shapeDeleted", ({ shapeId, boardId }) => {
       socket.to(boardId).emit("shapeDeleted", shapeId);
     });
+    socket.on("shapeDragging", ({ shape, boardId }) => {
+      socket.to(boardId).emit("shapeDragging", { shape });
+    });
   });
 
   return io;
