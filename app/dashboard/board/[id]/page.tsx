@@ -25,6 +25,7 @@ import {
   handleOnStageMouseUp,
   handleStageMouseDown,
 } from "./functions";
+import { EditorHeader } from "./Header";
 
 interface Shape {
   id: string;
@@ -41,6 +42,7 @@ export default function page() {
   } = useGetSingleBoard(boardId as string);
   const { socket } = useSocket();
   const [selectedShape, SetSelectedShape] = useState<string>("");
+  const [activeTab, setActiveTab] = useState("Both");
   const [drawAction, setDrawAction] = useState<DrawType>(DrawType.Select);
   const [shapes, setShapes] = useState<Shape[]>([]);
   const [editingText, setEditingText] = useState<{
@@ -247,7 +249,8 @@ export default function page() {
   }
   return (
     <div className="relative min-h-screen bg-primary-bg2">
-      <div className="fixed left-5 top-10 z-50 pointer-events-auto">
+      <div>
+      <div className="fixed left-5 top-15 z-50 pointer-events-auto">
         <Sidebar drawAction={drawAction} setDrawAction={setDrawAction} />
       </div>
 
@@ -259,7 +262,6 @@ export default function page() {
           key={editingText.id}
         />
       )}
-
       <div
         style={{
           width: "100vw",
@@ -269,10 +271,14 @@ export default function page() {
         }}
         className="minimal-scrollbar"
       >
+        <div className="fixed top-0 left-0 z-50 w-[99.2vw]">
+          <EditorHeader activeTab={activeTab} setActiveTab={setActiveTab} />
+        </div>
+
         <div style={{ width: 5000, height: 5000 }}>
           <Stage
-        width={5000}
-      height={5000}
+            width={5000}
+            height={5000}
             ref={stageRef}
             onMouseDown={onStageMouseDown}
             onMouseMove={onStageMouseMove}
@@ -331,6 +337,7 @@ export default function page() {
             </Layer>
           </Stage>
         </div>
+      </div>
       </div>
     </div>
   );
