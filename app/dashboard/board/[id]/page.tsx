@@ -13,10 +13,8 @@ import {
   Text,
   Transformer,
 } from "react-konva";
-import { v4 as uuidv4 } from "uuid";
 import { useParams } from "next/navigation";
 import { useUser } from "@/hooks/useUser";
-import { getSingleBoard, saveBoardElement } from "@/Queries/board";
 import { useGetSingleBoard } from "@/hooks/getWhiteboard";
 import { deleteShape, handleShapeUpdate } from "@/lib/helper";
 import { useSocket } from "@/context/socket.context";
@@ -262,67 +260,77 @@ export default function page() {
         />
       )}
 
-      <div className="w-full h-screen overflow-auto minimal-scrollbar">
-        <Stage
-          width={window.innerWidth}
-          height={window.innerHeight}
-          ref={stageRef}
-          onMouseDown={onStageMouseDown}
-          onMouseMove={onStageMouseMove}
-          onMouseUp={onStageMouseUp}
-          onClick={onStageClick}
-        >
-          <Layer>
-            {shapes.map((shape) => {
-              const props = {
-                id: shape.id,
-                ...shape.properties,
-                draggable: isDraggable,
-                onClick: (e: KonvaEventObject<MouseEvent>) =>
-                  onShapeClick(e, shape.id),
-                onDblClick:
-                  shape.type === DrawType.Text ? onTextDblClick : undefined,
-                onDragEnd: (e: KonvaEventObject<DragEvent>) => {
-                  handleShapeUpdate(
-                    e,
-                    shape.id,
-                    false,
-                    setShapes,
-                    socket,
-                    boardId as string
-                  );
-                },
-                onDragMove: (e: KonvaEventObject<DragEvent>) =>
-                  handleDragMove(e, shape),
-              };
+      <div
+        style={{
+          width: "100vw",
+          height: "100vh",
+          overflow: "scroll",
+          background: "#171717",
+        }}
+        className="minimal-scrollbar"
+      >
+        <div style={{ width: 5000, height: 5000 }}>
+          <Stage
+        width={5000}
+      height={5000}
+            ref={stageRef}
+            onMouseDown={onStageMouseDown}
+            onMouseMove={onStageMouseMove}
+            onMouseUp={onStageMouseUp}
+            onClick={onStageClick}
+          >
+            <Layer>
+              {shapes.map((shape) => {
+                const props = {
+                  id: shape.id,
+                  ...shape.properties,
+                  draggable: isDraggable,
+                  onClick: (e: KonvaEventObject<MouseEvent>) =>
+                    onShapeClick(e, shape.id),
+                  onDblClick:
+                    shape.type === DrawType.Text ? onTextDblClick : undefined,
+                  onDragEnd: (e: KonvaEventObject<DragEvent>) => {
+                    handleShapeUpdate(
+                      e,
+                      shape.id,
+                      false,
+                      setShapes,
+                      socket,
+                      boardId as string
+                    );
+                  },
+                  onDragMove: (e: KonvaEventObject<DragEvent>) =>
+                    handleDragMove(e, shape),
+                };
 
-              switch (shape.type) {
-                case DrawType.Arrow:
-                  return <Arrow key={shape.id} {...props} />;
-                case DrawType.Rectangle:
-                  return <Rect key={shape.id} {...props} />;
-                case DrawType.Circle:
-                  return <Circle key={shape.id} {...props} />;
-                case DrawType.Line:
-                  return <Line key={shape.id} {...props} />;
-                case DrawType.Scribble:
-                  return (
-                    <Line
-                      key={shape.id}
-                      {...props}
-                      lineJoin="round"
-                      lineCap="round"
-                    />
-                  );
-                case DrawType.Text:
-                  return <Text key={shape.id} {...props} id={shape.id} />;
-                default:
-                  return null;
-              }
-            })}
-            <Transformer ref={transformerRef} />
-          </Layer>
-        </Stage>
+                switch (shape.type) {
+                  case DrawType.Arrow:
+                    return <Arrow key={shape.id} {...props} />;
+                  case DrawType.Rectangle:
+                    return <Rect key={shape.id} {...props} />;
+                  case DrawType.Circle:
+                    return <Circle key={shape.id} {...props} />;
+                  case DrawType.Line:
+                    return <Line key={shape.id} {...props} />;
+                  case DrawType.Scribble:
+                    return (
+                      <Line
+                        key={shape.id}
+                        {...props}
+                        lineJoin="round"
+                        lineCap="round"
+                      />
+                    );
+                  case DrawType.Text:
+                    return <Text key={shape.id} {...props} id={shape.id} />;
+                  default:
+                    return null;
+                }
+              })}
+              <Transformer ref={transformerRef} />
+            </Layer>
+          </Stage>
+        </div>
       </div>
     </div>
   );
