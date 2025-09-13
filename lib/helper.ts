@@ -2,6 +2,8 @@ import { KonvaEventObject } from "konva/lib/Node";
 import { updateBoardElement } from "@/Queries/board";
 import { DrawType, Shape } from "@/types/allTypes";
 import { Socket } from "socket.io-client";
+import { supabase } from "./supabase";
+import { toast } from "sonner";
 
 export const isActiveLink = (href: string, currentPath: string) => {
   return href === currentPath;
@@ -62,4 +64,25 @@ export const handleShapeUpdate = (
       return { ...shape, properties: updatedProps };
     })
   );
+};
+export const deleteShape = async (
+  shapeId: string,
+  boardId: string,
+  socket: Socket | null,
+  setShape: React.Dispatch<React.SetStateAction<Shape[]>>
+) => {
+  setShape((prev) => prev.filter((shape) => shape.id !== shapeId));
+
+  const { error } = await supabase
+    .from("board_elements")
+    .delete()
+    .eq("id", shapeId);
+
+  if (error) {
+    console.error("Error deleting element:", error);
+    toast.error(`Error deleting element in database: ${error.message}`);
+    return error;
+  }
+
+  socket?.emit("shapeDeleted", { shapeId, boardId });
 };

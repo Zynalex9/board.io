@@ -18,7 +18,7 @@ import { useParams } from "next/navigation";
 import { useUser } from "@/hooks/useUser";
 import { getSingleBoard, saveBoardElement } from "@/Queries/board";
 import { useGetSingleBoard } from "@/hooks/getWhiteboard";
-import { handleShapeUpdate } from "@/lib/helper";
+import { deleteShape, handleShapeUpdate } from "@/lib/helper";
 import { useSocket } from "@/context/socket.context";
 
 interface Shape {
@@ -35,6 +35,7 @@ export default function page() {
     error: boardError,
   } = useGetSingleBoard(boardId as string);
   const { socket } = useSocket();
+  const [selectedShape, SetSelectedShape] = useState<string>("");
   const [drawAction, setDrawAction] = useState<DrawType>(DrawType.Select);
   const [shapes, setShapes] = useState<Shape[]>([]);
   const [editingText, setEditingText] = useState<{
@@ -217,14 +218,14 @@ export default function page() {
     );
   }, [shapes]);
   const onShapeClick = useCallback(
-    (e: KonvaEventObject<MouseEvent>) => {
+    (e: KonvaEventObject<MouseEvent>, shapeId: string) => {
       if (drawAction !== DrawType.Select) return;
+      SetSelectedShape(shapeId);
       transformerRef.current.nodes([e.target]);
       transformerRef.current.getLayer().batchDraw();
     },
     [drawAction]
   );
-
   const onStageClick = useCallback((e: KonvaEventObject<MouseEvent>) => {
     if (e.target === e.target.getStage()) {
       transformerRef.current.nodes([]);
@@ -267,13 +268,34 @@ export default function page() {
         return next;
       });
     };
+    const handleDelete = (shapeId: string) => {
+      console.log("Deleted shape:", shapeId);
+      setShapes((prev) => prev.filter((shape) => shape.id !== shapeId));
+      SetSelectedShape("");
+    };
 
     socket.on("shapeDragged", handleDragged);
+    socket.on("shapeDeleted", handleDelete);
 
     return () => {
       socket.off("shapeDragged", handleDragged);
     };
   }, [socket, setShapes]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Delete") {
+        transformerRef.current.nodes([]);
+        deleteShape(selectedShape, boardId as string, socket, setShapes);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [selectedShape]);
 
   socket?.on("newShape", (lastElem) => {
     setShapes((prev) => {
@@ -358,11 +380,19 @@ export default function page() {
                 id: shape.id,
                 ...shape.properties,
                 draggable: isDraggable,
-                onClick: onShapeClick,
+                onClick: (e: KonvaEventObject<MouseEvent>) =>
+                  onShapeClick(e, shape.id),
                 onDblClick:
                   shape.type === DrawType.Text ? onTextDblClick : undefined,
                 onDragEnd: (e: KonvaEventObject<DragEvent>) => {
-                  handleShapeUpdate(e, shape.id, false, setShapes, socket,boardId as string);
+                  handleShapeUpdate(
+                    e,
+                    shape.id,
+                    false,
+                    setShapes,
+                    socket,
+                    boardId as string
+                  );
                 },
               };
 
