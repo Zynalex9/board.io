@@ -20,6 +20,13 @@ import { getSingleBoard, saveBoardElement } from "@/Queries/board";
 import { useGetSingleBoard } from "@/hooks/getWhiteboard";
 import { deleteShape, handleShapeUpdate } from "@/lib/helper";
 import { useSocket } from "@/context/socket.context";
+import { useBoardSocket } from "./hooks/useBoardSockets";
+import { TextEditorOverlay } from "./TextEditingOverlay";
+import {
+  handleOnShapeClick,
+  handleOnStageMouseUp,
+  handleStageMouseDown,
+} from "./functions";
 
 interface Shape {
   id: string;
@@ -50,99 +57,13 @@ export default function page() {
   const currentShapeRef = useRef<string>("");
   const isPaintRef = useRef(false);
   const onStageMouseDown = useCallback(() => {
-    if (drawAction === DrawType.Select) return;
-    const stage = stageRef.current;
-    const pos = stage.getPointerPosition();
-    const x = pos?.x || 0;
-    const y = pos?.y || 0;
-    const id = uuidv4();
-    currentShapeRef.current = id;
-
-    let newShape: Shape;
-
-    switch (drawAction) {
-      case DrawType.Rectangle:
-        newShape = {
-          id,
-          type: DrawType.Rectangle,
-          properties: {
-            x,
-            y,
-            width: 1,
-            height: 1,
-            stroke: "white",
-            strokeWidth: 2,
-            fill: "transparent",
-          },
-        };
-        break;
-      case DrawType.Circle:
-        newShape = {
-          id,
-          type: DrawType.Circle,
-          properties: {
-            x,
-            y,
-            radius: 1,
-            stroke: "white",
-            strokeWidth: 2,
-            fill: "transparent",
-          },
-        };
-        break;
-      case DrawType.Line:
-        newShape = {
-          id,
-          type: DrawType.Line,
-          properties: { points: [x, y, x, y], stroke: "white", strokeWidth: 2 },
-        };
-        break;
-      case DrawType.Arrow:
-        newShape = {
-          id,
-          type: DrawType.Arrow,
-          properties: {
-            points: [x, y, x, y],
-            stroke: "white",
-            strokeWidth: 2,
-            pointerLength: 10,
-            pointerWidth: 10,
-          },
-        };
-        break;
-      case DrawType.Scribble:
-        newShape = {
-          id,
-          type: DrawType.Scribble,
-          properties: {
-            points: [x, y],
-            stroke: "white",
-            strokeWidth: 2,
-            lineCap: "round",
-            lineJoin: "round",
-          },
-        };
-        break;
-      case DrawType.Text:
-        newShape = {
-          id,
-          type: DrawType.Text,
-          properties: {
-            x,
-            y,
-            text: "Double-click to edit",
-            fontSize: 18,
-            fill: "white",
-            draggable: true,
-          },
-        };
-        break;
-      default:
-        return;
-    }
-
-    setShapes((prev) => [...prev, newShape]);
-    isPaintRef.current = drawAction !== DrawType.Text;
+    handleStageMouseDown(
+      drawAction,
+      stageRef,
+      currentShapeRef,
+      setShapes,
+      isPaintRef
+    );
   }, [drawAction]);
   const onStageMouseMove = useCallback(() => {
     if (drawAction === DrawType.Select || !isPaintRef.current) return;
@@ -205,24 +126,25 @@ export default function page() {
     );
   }, [drawAction]);
   const onStageMouseUp = useCallback(() => {
-    isPaintRef.current = false;
-    if (drawAction === DrawType.Select) return;
-    const lastElem = shapes[shapes.length - 1];
-    setDrawAction(DrawType.Select);
-    socket?.emit("newShape", { lastElem, boardId });
-    saveBoardElement(
+    handleOnStageMouseUp(
+      drawAction,
+      shapes,
       boardId as string,
-      lastElem,
-      lastElem.type.toLocaleLowerCase(),
-      user?.id || ""
+      isPaintRef,
+      socket,
+      setDrawAction,
+      user
     );
   }, [shapes]);
   const onShapeClick = useCallback(
     (e: KonvaEventObject<MouseEvent>, shapeId: string) => {
-      if (drawAction !== DrawType.Select) return;
-      SetSelectedShape(shapeId);
-      transformerRef.current.nodes([e.target]);
-      transformerRef.current.getLayer().batchDraw();
+      handleOnShapeClick(
+        e,
+        shapeId,
+        drawAction,
+        SetSelectedShape,
+        transformerRef
+      );
     },
     [drawAction]
   );
@@ -254,42 +176,9 @@ export default function page() {
   }, [board]);
   useEffect(() => {
     if (!socket) return;
-
     socket.emit("joinedBoard", boardId);
   }, [socket, boardId]);
-  useEffect(() => {
-    if (!socket) return;
-
-    const handleDragged = (updatedShape: Shape) => {
-      setShapes((prev) => {
-        const next = prev.map((shape) =>
-          shape.id === updatedShape.id ? updatedShape : shape
-        );
-        return next;
-      });
-    };
-    const handleDelete = (shapeId: string) => {
-      console.log("Deleted shape:", shapeId);
-      setShapes((prev) => prev.filter((shape) => shape.id !== shapeId));
-      SetSelectedShape("");
-    };
-
-    const handleLiveDrag = (payload: any) => {
-      const shape: Shape = payload?.shape ?? payload;
-      if (!shape?.id) return;
-      setShapes((prev) => prev.map((s) => (s.id === shape.id ? shape : s)));
-    };
-
-    socket.on("shapeDragged", handleDragged);
-    socket.on("shapeDeleted", handleDelete);
-    socket.on("shapeDragging", handleLiveDrag);
-
-    return () => {
-      socket.off("shapeDragged", handleDragged);
-      socket.off("shapeDeleted", handleDelete);
-      socket.off("shapeDragging", handleLiveDrag);
-    };
-  }, [socket, setShapes]);
+  useBoardSocket(socket, boardId as string, setShapes, SetSelectedShape);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -306,12 +195,6 @@ export default function page() {
     };
   }, [selectedShape]);
 
-  socket?.on("newShape", (lastElem) => {
-    setShapes((prev) => {
-      const exists = prev.some((pv) => pv.id === lastElem.id);
-      return exists ? prev : [...prev, lastElem];
-    });
-  });
   const dragEmitRef = useRef<{ lastTime: number; timeout?: number }>({
     lastTime: 0,
   });
@@ -371,49 +254,11 @@ export default function page() {
       </div>
 
       {editingText && (
-        <textarea
-          className="absolute bg-transparent border border-gray-400 text-white outline-none resize-none"
-          style={{
-            top: editingText.y,
-            left: editingText.x,
-            fontSize: "18px",
-            color: "white",
-          }}
-          value={editingText.text}
-          autoFocus
-          onChange={(e) =>
-            setEditingText((prev) =>
-              prev ? { ...prev, text: e.target.value } : null
-            )
-          }
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              setShapes((prev) =>
-                prev.map((s) =>
-                  s.id === editingText.id
-                    ? {
-                        ...s,
-                        properties: { ...s.properties, text: editingText.text },
-                      }
-                    : s
-                )
-              );
-              setEditingText(null);
-            }
-          }}
-          onBlur={() => {
-            setShapes((prev) =>
-              prev.map((s) =>
-                s.id === editingText.id
-                  ? {
-                      ...s,
-                      properties: { ...s.properties, text: editingText.text },
-                    }
-                  : s
-              )
-            );
-            setEditingText(null);
-          }}
+        <TextEditorOverlay
+          editingText={editingText}
+          setEditingText={setEditingText}
+          setShapes={setShapes}
+          key={editingText.id}
         />
       )}
 
