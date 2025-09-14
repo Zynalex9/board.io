@@ -26,7 +26,6 @@ import {
   handleStageMouseDown,
 } from "./functions";
 import { EditorHeader } from "./Header";
-import { AiOutlineAlignRight } from "react-icons/ai";
 import { Doc } from "./Doc/Doc";
 
 interface Shape {
