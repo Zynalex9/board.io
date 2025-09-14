@@ -18,6 +18,7 @@ export const initSocket = (server: any) => {
       socket.join(boardId);
       console.log("Joined workspace:", boardId);
     });
+    //Shape
     socket.on("newShape", ({ lastElem, boardId }) => {
       socket.to(boardId).emit("newShape", lastElem);
     });
@@ -29,6 +30,10 @@ export const initSocket = (server: any) => {
     });
     socket.on("shapeDragging", ({ shape, boardId }) => {
       socket.to(boardId).emit("shapeDragging", { shape });
+    });
+    //Document
+    socket.on("documented:updated", (data) => {
+      socket.to(data.boardId).emit("documented:updated", data.json);
     });
   });
 

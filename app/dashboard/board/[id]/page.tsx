@@ -272,11 +272,15 @@ export default function page() {
             <EditorHeader activeTab={activeTab} setActiveTab={setActiveTab} />
           </div>
           {activeTab === "Document" && (
-            <div className="bg-red-500 w-full h-screen"></div>
+            <div className="w-full h-screen">
+              <Doc boardId={boardId as string} />
+            </div>
           )}
           {activeTab === "Both" && (
             <div className="flex w-full h-screen">
-            <Doc/>
+              <div className="w-[30rem] h-full">
+                <Doc boardId={boardId as string} />
+              </div>
 
               <div className="flex-1 relative bg-[#171717] overflow-auto">
                 <div className="fixed left-[40%] top-15 z-50 pointer-events-auto">

@@ -176,7 +176,6 @@ export const MenuBar = ({ editor }: { editor: any }) => {
         </PopoverContent>
       </Popover>
 
-      {/* Font Size Dropdown */}
       <select
         onChange={(e) =>
           editor.chain().focus().setMark("textStyle", { fontSize: e.target.value }).run()
