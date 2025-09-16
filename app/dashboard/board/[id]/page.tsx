@@ -27,6 +27,7 @@ import {
 } from "./functions";
 import { EditorHeader } from "./Header";
 import { Doc } from "./Doc/Doc";
+import { Chat } from "@/components/Chat/Chat";
 
 interface Shape {
   id: string;
@@ -42,8 +43,9 @@ export default function page() {
     error: boardError,
   } = useGetSingleBoard(boardId as string);
   const { socket } = useSocket();
+  const [openChat, setOpenChat] = useState(false);
   const [selectedShape, SetSelectedShape] = useState<string>("");
-  const [activeTab, setActiveTab] = useState("Both");
+  const [activeTab, setActiveTab] = useState("Document");
   const [drawAction, setDrawAction] = useState<DrawType>(DrawType.Select);
   const [shapes, setShapes] = useState<Shape[]>([]);
   const [editingText, setEditingText] = useState<{
@@ -269,11 +271,19 @@ export default function page() {
           className="minimal-scrollbar"
         >
           <div className="fixed top-0 left-0 z-50 w-[99.2vw]">
-            <EditorHeader activeTab={activeTab} setActiveTab={setActiveTab} />
+            <EditorHeader
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              openChat={openChat}
+              setOpenChat={setOpenChat}
+            />
           </div>
           {activeTab === "Document" && (
-            <div className="w-full h-screen">
+            <div className="w-full h-screen flex">
               <Doc boardId={boardId as string} />
+              {openChat && (
+                <Chat openChat={openChat} setOpenChat={setOpenChat} />
+              )}
             </div>
           )}
           {activeTab === "Both" && (

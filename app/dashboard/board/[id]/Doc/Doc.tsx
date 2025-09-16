@@ -63,7 +63,7 @@ export const Doc = ({ boardId }: { boardId: string }) => {
   }, [socket, editor]); 
 
   return (
-    <div className="pt-20 border-r border-r-gray-400 w-full h-[100vh] max-h-100vh overflow-auto minimal-scrollbar">
+    <div className="pt-20  w-full h-[100vh] max-h-100vh overflow-auto minimal-scrollbar">
       <div className="w-full flex items-center gap-2 px-4 py-2">
         <input
           className="text-3xl text-gray-700 placeholder:text-3xl placeholder:text-gray-400 focus:outline-0 border-0"

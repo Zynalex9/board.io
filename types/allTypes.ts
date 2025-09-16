@@ -313,3 +313,13 @@ export interface Shape {
   type: DrawType;
   properties: newBoardElement["properties"];
 }
+export interface Message {
+  id: string;
+  board_id: string;
+  sender_id: string;
+  message: string;
+  created_at: string;
+  updated_at: string;
+  user: User; 
+  board?: Board; 
+}

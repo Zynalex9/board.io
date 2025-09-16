@@ -1,12 +1,17 @@
+import { Toggle } from "@/components/ui/toggle";
 import { useState } from "react";
 import { FaChevronDown } from "react-icons/fa";
 
 export const EditorHeader = ({
   activeTab,
   setActiveTab,
+  openChat,
+  setOpenChat,
 }: {
   activeTab: string;
   setActiveTab: React.Dispatch<React.SetStateAction<string>>;
+  openChat: boolean;
+  setOpenChat: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   return (
     <header className="flex w-full items-center justify-between bg-[#1E1E1E] text-white px-4 py-2">
@@ -38,9 +43,16 @@ export const EditorHeader = ({
         <button className="bg-[#0078FF] hover:bg-[#006be0] text-sm font-medium px-3 py-1 rounded-md">
           Share
         </button>
-        <button className="w-8 h-8 flex items-center justify-center hover:bg-[#2A2A2A] rounded-md">
+        <Toggle
+          pressed={openChat}
+          onPressedChange={setOpenChat}
+          className={`w-8 h-8 flex items-center justify-center rounded-md ${
+            openChat ? "bg-[#3A3A3A]" : "hover:bg-[#2A2A2A]"
+          }`}
+        >
           💬
-        </button>
+        </Toggle>
+
         <button className="w-8 h-8 flex items-center justify-center hover:bg-[#2A2A2A] rounded-md">
           📑
         </button>

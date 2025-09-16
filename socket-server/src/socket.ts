@@ -35,6 +35,11 @@ export const initSocket = (server: any) => {
     socket.on("documented:updated", (data) => {
       socket.to(data.boardId).emit("documented:updated", data.json);
     });
+    //Chat
+    socket.on("newMessage", (data) => {
+      console.log(data);
+      socket.to(data.boardId).emit("newMessage", data.message);
+    });
   });
 
   return io;
