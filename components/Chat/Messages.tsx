@@ -4,7 +4,7 @@ import { useUser } from "@/hooks/useUser";
 import { supabase } from "@/lib/supabase";
 import { Message, User } from "@/types/allTypes";
 import { useParams } from "next/navigation";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import Image from "next/image";
 import { format } from "date-fns";
 
@@ -15,7 +15,7 @@ export const Messages = () => {
   const { data: user } = useUser();
   const [typing, setTyping] = React.useState(false);
   const [typingUser, setTypingUser] = React.useState<User>();
-
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const fetchMessages = async () => {
     const { data, error: MessagesError } = await supabase
       .from("chats")
@@ -48,6 +48,9 @@ export const Messages = () => {
   useEffect(() => {
     fetchMessages();
   }, []);
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [typing, messages]);
 
   return (
     <div className="flex flex-col gap-3 py-4 px-1">
@@ -57,6 +60,7 @@ export const Messages = () => {
 
           return (
             <div
+              ref={messagesEndRef}
               key={message.id}
               className={`flex items-start gap-3 ${
                 isMe ? "flex-row-reverse" : ""
