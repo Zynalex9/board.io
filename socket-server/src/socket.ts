@@ -40,6 +40,10 @@ export const initSocket = (server: any) => {
       console.log(data);
       io.to(data.boardId).emit("newMessage", data);
     });
+    socket.on("onTyping", (data) => {
+      console.log(data);
+      socket.to(data.boardId).emit("onTyping", data);
+    });
   });
 
   return io;

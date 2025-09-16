@@ -3,7 +3,7 @@ import { useSocket } from "@/context/socket.context";
 import { useUser } from "@/hooks/useUser";
 import { supabase } from "@/lib/supabase";
 import { useParams } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export const ChatInput = () => {
@@ -11,6 +11,7 @@ export const ChatInput = () => {
   const { id: boardId } = useParams();
   const { socket } = useSocket();
   const { data: user } = useUser();
+  const [isTyping, setIsTyping] = useState(false);
   const sendMessage = async () => {
     if (message.trim() === "") return;
     socket?.emit("newMessage", {
@@ -32,6 +33,16 @@ export const ChatInput = () => {
       return error;
     }
   };
+  useEffect(() => {
+    if (message.length > 0) {
+      setIsTyping(true);
+    } else {
+      setIsTyping(false);
+    }
+  }, [message]);
+  useEffect(() => {
+    socket?.emit("onTyping", { boardId, isTyping, user });
+  }, [isTyping]);
   return (
     <div className="flex items-center gap-1 px-0.5">
       <textarea
@@ -40,10 +51,14 @@ export const ChatInput = () => {
         placeholder="Type a message"
         rows={1}
         onKeyDown={(e) => {
-          if (e.key === "Enter") sendMessage();
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault(); 
+            sendMessage();
+          }
         }}
         className="w-full max-h-32 resize-none overflow-y-auto rounded-lg border border-gray-500 bg-primary-bg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
+
       <button
         onClick={sendMessage}
         className="rounded-md bg-blue-600 p-2 text-sm text-white hover:bg-blue-700"

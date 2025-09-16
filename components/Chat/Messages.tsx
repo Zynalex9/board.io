@@ -2,7 +2,7 @@
 import { useSocket } from "@/context/socket.context";
 import { useUser } from "@/hooks/useUser";
 import { supabase } from "@/lib/supabase";
-import { Message } from "@/types/allTypes";
+import { Message, User } from "@/types/allTypes";
 import { useParams } from "next/navigation";
 import React, { useEffect } from "react";
 import Image from "next/image";
@@ -13,6 +13,8 @@ export const Messages = () => {
   const [messages, setMessages] = React.useState<Message[]>([]);
   const { socket } = useSocket();
   const { data: user } = useUser();
+  const [typing, setTyping] = React.useState(false);
+  const [typingUser, setTypingUser] = React.useState<User>();
 
   const fetchMessages = async () => {
     const { data, error: MessagesError } = await supabase
@@ -23,14 +25,23 @@ export const Messages = () => {
     if (MessagesError) throw new Error(MessagesError.message);
     setMessages(data || []);
   };
+
   useEffect(() => {
     const handleNewMessage = (data: Message) => {
       setMessages((prevMessages) => [...prevMessages, data]);
     };
 
+    const handleTyping = (data: any) => {
+      setTyping(data.isTyping);
+      setTypingUser(data.user);
+    };
+
     socket?.on("newMessage", handleNewMessage);
+    socket?.on("onTyping", handleTyping);
+
     return () => {
       socket?.off("newMessage", handleNewMessage);
+      socket?.off("onTyping", handleTyping);
     };
   }, [socket]);
 
@@ -39,7 +50,7 @@ export const Messages = () => {
   }, []);
 
   return (
-    <div className="flex flex-col gap-3 py-4 px-2">
+    <div className="flex flex-col gap-3 py-4 px-1">
       {messages.length > 0 &&
         messages.map((message) => {
           const isMe = user?.id === message.user.id;
@@ -51,16 +62,19 @@ export const Messages = () => {
                 isMe ? "flex-row-reverse" : ""
               }`}
             >
-              <Image
-                src={
-                  message.user.avatar_url ||
-                  "/Profile_avatar_placeholder_large.png"
-                }
-                alt={message.user.username}
-                width={36}
-                height={36}
-                className="h-9 w-9 rounded-full object-cover border border-gray-700"
-              />
+              {!isMe && (
+                <Image
+                  src={
+                    message.user.avatar_url ||
+                    "/Profile_avatar_placeholder_large.png"
+                  }
+                  alt={message.user.username}
+                  width={36}
+                  height={36}
+                  className="h-9 w-9 rounded-full object-cover border border-gray-700"
+                />
+              )}
+
               <div
                 className={`flex flex-col ${
                   isMe ? "items-end text-right" : "items-start text-left"
@@ -89,6 +103,27 @@ export const Messages = () => {
             </div>
           );
         })}
+      {typing && typingUser && typingUser.id !== user?.id && (
+        <div className="flex items-center gap-2">
+          <Image
+            src={
+              typingUser.avatar_url || "/Profile_avatar_placeholder_large.png"
+            }
+            alt={typingUser.username}
+            width={28}
+            height={28}
+            className="h-7 w-7 rounded-full object-cover border border-gray-700"
+          />
+          <div className="px-3 py-1.5 rounded-md bg-[#1f1f1f] text-gray-300 text-sm flex items-center gap-1">
+            <span className="mr-1">{typingUser.username} is typing</span>
+            <span className="flex gap-1">
+              <span className="w-1 h-1 bg-gray-400 rounded-full animate-bounce"></span>
+              <span className="w-1 h-1 bg-gray-400 rounded-full animate-bounce delay-150"></span>
+              <span className="w-1 h-1 bg-gray-400 rounded-full animate-bounce delay-300"></span>
+            </span>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
