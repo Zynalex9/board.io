@@ -38,7 +38,7 @@ export const initSocket = (server: any) => {
     //Chat
     socket.on("newMessage", (data) => {
       console.log(data);
-      socket.to(data.boardId).emit("newMessage", data.message);
+      io.to(data.boardId).emit("newMessage", data);
     });
   });
 

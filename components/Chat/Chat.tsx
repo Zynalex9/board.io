@@ -11,9 +11,9 @@ export const Chat = ({
   setOpenChat: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   return (
-    <div className="w-[25%] pb-2 rounded-md h-[80vh] flex flex-col silver-border-nr bg-primary-bg mt-14">
+    <div className="w-[40%] pb-2 rounded-md h-[80vh] flex flex-col silver-border-nr bg-primary-bg mt-14">
       <ChatHeader openChat={openChat} setOpenChat={setOpenChat} />
-      <div className="flex-grow px-2">
+      <div className="flex-grow px-2 overflow-y-auto minimal-scrollbar">
         <Messages />
       </div>
       <ChatInput />

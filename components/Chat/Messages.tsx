@@ -23,17 +23,23 @@ export const Messages = () => {
     if (MessagesError) throw new Error(MessagesError.message);
     setMessages(data || []);
   };
+  useEffect(() => {
+    const handleNewMessage = (data: Message) => {
+      setMessages((prevMessages) => [...prevMessages, data]);
+    };
 
-  socket?.on("newMessage", (data) => {
-    console.log("data", data);
-  });
+    socket?.on("newMessage", handleNewMessage);
+    return () => {
+      socket?.off("newMessage", handleNewMessage);
+    };
+  }, [socket]);
 
   useEffect(() => {
     fetchMessages();
   }, []);
 
   return (
-    <div className="flex flex-col gap-3 py-4 px-2 overflow-y-auto ">
+    <div className="flex flex-col gap-3 py-4 px-2">
       {messages.length > 0 &&
         messages.map((message) => {
           const isMe = user?.id === message.user.id;
@@ -62,16 +68,20 @@ export const Messages = () => {
               >
                 <div className="flex items-center gap-2 text-xs text-gray-400">
                   <span className="font-medium text-gray-300">
-                    {message.user.username}
+                    {isMe
+                      ? `${message.user.username} (You)`
+                      : message.user.username}
                   </span>
                   <span>{format(new Date(message.created_at), "hh:mm a")}</span>
                 </div>
                 <p
-                  className={`mt-1 px-3 py-1.5 rounded-md text-sm leading-snug ${
-                    isMe
-                      ? "bg-[var(--color-primary-bg2)] text-gray-100"
-                      : "bg-[#1f1f1f] text-gray-200"
-                  }`}
+                  className={`mt-1 px-3 py-1.5 rounded-md text-sm leading-snug 
+              break-words whitespace-pre-wrap
+              ${
+                isMe
+                  ? "bg-[var(--color-primary-bg2)] text-gray-100 max-w-[17rem]"
+                  : "bg-[#1f1f1f] text-gray-200 max-w-[17rem]"
+              }`}
                 >
                   {message.message}
                 </p>

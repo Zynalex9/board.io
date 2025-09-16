@@ -13,7 +13,14 @@ export const ChatInput = () => {
   const { data: user } = useUser();
   const sendMessage = async () => {
     if (message.trim() === "") return;
-    socket?.emit("newMessage", { message, boardId, user });
+    socket?.emit("newMessage", {
+      id: Date.now(),
+      created_at: Date.now(),
+      message,
+      sender_id: user?.id,
+      boardId,
+      user,
+    });
     setMessage("");
     const { error } = await supabase
       .from("chats")
