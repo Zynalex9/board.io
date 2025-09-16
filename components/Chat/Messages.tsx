@@ -5,6 +5,8 @@ import { supabase } from "@/lib/supabase";
 import { Message } from "@/types/allTypes";
 import { useParams } from "next/navigation";
 import React, { useEffect } from "react";
+import Image from "next/image";
+import { format } from "date-fns";
 
 export const Messages = () => {
   const { id } = useParams();
@@ -13,7 +15,6 @@ export const Messages = () => {
   const { data: user } = useUser();
 
   const fetchMessages = async () => {
-    console.log("I am the id", id);
     const { data, error: MessagesError } = await supabase
       .from("chats")
       .select("*, user:sender_id(*)")
@@ -32,7 +33,7 @@ export const Messages = () => {
   }, []);
 
   return (
-    <div className="flex flex-col gap-2 p-4 overflow-y-auto bg-primary-bg">
+    <div className="flex flex-col gap-3 py-4 px-2 overflow-y-auto ">
       {messages.length > 0 &&
         messages.map((message) => {
           const isMe = user?.id === message.user.id;
@@ -40,19 +41,40 @@ export const Messages = () => {
           return (
             <div
               key={message.id}
-              className={`flex ${isMe ? "justify-end" : "justify-start"}`}
+              className={`flex items-start gap-3 ${
+                isMe ? "flex-row-reverse" : ""
+              }`}
             >
+              <Image
+                src={
+                  message.user.avatar_url ||
+                  "/Profile_avatar_placeholder_large.png"
+                }
+                alt={message.user.username}
+                width={36}
+                height={36}
+                className="h-9 w-9 rounded-full object-cover border border-gray-700"
+              />
               <div
-                className={`max-w-[70%] rounded-2xl px-4 py-2 text-sm shadow-md ${
-                  isMe
-                    ? "bg-blue-600 text-white rounded-br-none"
-                    : "bg-gray-200 text-gray-900 rounded-bl-none"
+                className={`flex flex-col ${
+                  isMe ? "items-end text-right" : "items-start text-left"
                 }`}
               >
-                <p className="break-words">{message.message}</p>
-                <span className="mt-1 block text-xs opacity-70">
-                  {message.user.username}
-                </span>
+                <div className="flex items-center gap-2 text-xs text-gray-400">
+                  <span className="font-medium text-gray-300">
+                    {message.user.username}
+                  </span>
+                  <span>{format(new Date(message.created_at), "hh:mm a")}</span>
+                </div>
+                <p
+                  className={`mt-1 px-3 py-1.5 rounded-md text-sm leading-snug ${
+                    isMe
+                      ? "bg-[var(--color-primary-bg2)] text-gray-100"
+                      : "bg-[#1f1f1f] text-gray-200"
+                  }`}
+                >
+                  {message.message}
+                </p>
               </div>
             </div>
           );
