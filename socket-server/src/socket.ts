@@ -11,12 +11,15 @@ export const initSocket = (server: any) => {
     },
   });
 
+  const userToSocket = new Map<string, string>();
+  const socketToUser = new Map<string, string>();
+
   io.on("connection", (socket) => {
     console.log("User connected", socket.id);
 
     socket.on("joinedBoard", (boardId) => {
       socket.join(boardId);
-      console.log("Joined workspace:", boardId);
+      console.log("Joined board:", boardId);
     });
     //Shape
     socket.on("newShape", ({ lastElem, boardId }) => {
@@ -43,6 +46,29 @@ export const initSocket = (server: any) => {
     socket.on("onTyping", (data) => {
       console.log(data);
       socket.to(data.boardId).emit("onTyping", data);
+    });
+
+    //WEB RTC
+    socket.on("webRTC:user-join", (data) => {
+      const { user, boardId } = data;
+      userToSocket.set(user.id, socket.id);
+      socketToUser.set(socket.id, user.id);
+      console.log("new user joined:", user.id, "socket:", socket.id);
+      socket.to(boardId).emit("webRTC:new-user-join", user);
+    });
+
+    socket.on("webRTC:offer", ({ boardId, to, from, offer }) => {
+      console.log("Forwarding offer to", to, "from", from);
+      const toSocket = userToSocket.get(to);
+      socket.to(toSocket as string).emit("webRTC:offer", { from, offer });
+    });
+
+    socket.on("webRTC:answer", ({ boardId, to, from, answer }) => {
+      console.log(`Forwarding answer from ${from} to ${to}`);
+      const toSocket = userToSocket.get(to);
+      if (toSocket) {
+        io.to(toSocket).emit("webRTC:answer", { from, answer });
+      }
     });
   });
 

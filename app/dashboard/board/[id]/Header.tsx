@@ -7,11 +7,15 @@ export const EditorHeader = ({
   setActiveTab,
   openChat,
   setOpenChat,
+  openVideoChat,
+  setOpenVideoChat,
 }: {
   activeTab: string;
   setActiveTab: React.Dispatch<React.SetStateAction<string>>;
   openChat: boolean;
   setOpenChat: React.Dispatch<React.SetStateAction<boolean>>;
+  openVideoChat: boolean;
+  setOpenVideoChat: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   return (
     <header className="flex w-full items-center justify-between bg-[#1E1E1E] text-white px-4 py-2">
@@ -53,7 +57,10 @@ export const EditorHeader = ({
           💬
         </Toggle>
 
-        <button className="w-8 h-8 flex items-center justify-center hover:bg-[#2A2A2A] rounded-md">
+        <button
+          onClick={() => setOpenVideoChat(!openVideoChat)}
+          className="w-8 h-8 flex items-center justify-center hover:bg-[#2A2A2A] rounded-md"
+        >
           📑
         </button>
       </div>

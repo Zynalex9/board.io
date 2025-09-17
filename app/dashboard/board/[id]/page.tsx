@@ -28,6 +28,7 @@ import {
 import { EditorHeader } from "./Header";
 import { Doc } from "./Doc/Doc";
 import { Chat } from "@/components/Chat/Chat";
+import { VideoChat } from "@/components/VideoRTC/VideoChat";
 
 interface Shape {
   id: string;
@@ -44,6 +45,7 @@ export default function page() {
   } = useGetSingleBoard(boardId as string);
   const { socket } = useSocket();
   const [openChat, setOpenChat] = useState(false);
+  const [openVideoChat, setOpenVideoChat] = useState(false);
   const [selectedShape, SetSelectedShape] = useState<string>("");
   const [activeTab, setActiveTab] = useState("Document");
   const [drawAction, setDrawAction] = useState<DrawType>(DrawType.Select);
@@ -276,6 +278,8 @@ export default function page() {
               setActiveTab={setActiveTab}
               openChat={openChat}
               setOpenChat={setOpenChat}
+              openVideoChat={openVideoChat}
+              setOpenVideoChat={setOpenVideoChat}
             />
           </div>
           {activeTab === "Document" && (
@@ -283,6 +287,12 @@ export default function page() {
               <Doc boardId={boardId as string} />
               {openChat && (
                 <Chat openChat={openChat} setOpenChat={setOpenChat} />
+              )}
+              {openVideoChat && (
+                <VideoChat
+                  openVideoChat={openVideoChat}
+                  setOpenVideoChat={setOpenVideoChat}
+                />
               )}
             </div>
           )}
